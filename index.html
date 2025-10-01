@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vidusha Chathuranga | Developer & Resume Writer</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Load Tone.js for ambient music -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    
+    <!-- NEW: Import Playfair Display from Google Fonts for a professional headline style -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom Tailwind Configuration */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#0f172a', /* slate-900 */
+                        'secondary-dark': '#1e293b', /* slate-800 */
+                        'accent-blue': '#3b82f6', /* blue-500 */
+                        'accent-purple': '#8b5cf6', /* violet-500 */
+                        'text-light': '#f8fafc', /* slate-50 */
+                        'text-muted': '#94a3b8', /* slate-400 */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        // Define 'display' font for the name
+                        display: ['"Playfair Display"', 'serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.8s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s ease-out forwards',
+                        'skill-walk': 'walkingAnimation 8s infinite alternate ease-in-out', /* New walk animation */
+                        'skill-wobble': 'handingRotate 2s infinite alternate ease-in-out', /* New handing animation */
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        /* UPDATED: Increased translation for a more visible walking animation */
+                        walkingAnimation: {
+                            '0%': { transform: 'translateX(0) translateY(0) rotate(0deg)' },
+                            '25%': { transform: 'translateX(15px) translateY(-15px) rotate(3deg)' }, /* Increased to 15px */
+                            '50%': { transform: 'translateX(0) translateY(0) rotate(0deg)' },
+                            '75%': { transform: 'translateX(-15px) translateY(15px) rotate(-3deg)' }, /* Increased to 15px */
+                            '100%': { transform: 'translateX(0) translateY(0) rotate(0deg)' },
+                        },
+                        handingRotate: {
+                            '0%, 100%': { transform: 'rotate(5deg) scale(1)' },
+                            '50%': { transform: 'rotate(-5deg) scale(0.98)' },
+                        }
+                    }
+                }
+            }
+        }
+        /* Global Styles */
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        /* Utility for fade-on-scroll: MUST be styled with initial opacity 0 */
+        /* UPDATED: Added rotation and scale for a "curly" entering animation */
+        .fade-in-scroll {
+            opacity: 0;
+            transform: translateY(30px) rotate(-3deg) scale(0.98); /* Start lower, slightly rotated and scaled down */
+            transition: opacity 0.7s ease-out, transform 0.7s ease-out; /* Longer transition for smoothness */
+        }
+        .fade-in-scroll.visible {
+            opacity: 1;
+            transform: translateY(0) rotate(0deg) scale(1); /* End at original position */
+        }
+
+        /* Custom Scrollbar for a sleek look */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #5a9bff; }
+        
+        /* The border-r-2 creates the classic "typing cursor" effect */
+        #role-text {
+            border-right: 2px solid #8b5cf6; /* Matches accent-purple */
+            padding-right: 4px; /* Space between text and cursor */
+            transition: all 0.1s ease;
+        }
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- Ambient Music Toggle Button (Click this to start the music!) -->
+    <button id="musicToggle" class="fixed bottom-4 right-4 z-50 p-3 rounded-full bg-accent-purple text-white shadow-lg transition duration-300 hover:bg-violet-600 focus:outline-none focus:ring-4 focus:ring-violet-300 transform hover:scale-105" aria-label="Toggle ambient music">
+        <i class="fas fa-volume-mute" id="musicIcon"></i>
+    </button>
+    
+    <!-- Skill Walker Animation Container (visible on all screens) -->
+    <div id="skill-walker-animation" class="fixed bottom-28 right-10 z-30 block animate-skill-walk" style="animation-delay: 1s;">
+        <!-- Content will be injected by JavaScript -->
+    </div>
+    <!-- END NEW: Skill Walker Animation Container -->
+
+    <!-- Header & Navigation -->
+    <header class="sticky top-0 z-40 bg-primary-dark/95 backdrop-blur-sm shadow-lg border-b border-secondary-dark">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <a href="#home" class="text-2xl font-bold text-accent-blue hover:text-accent-purple transition duration-300">Vidusha C.</a>
+            <div class="space-x-4 hidden md:flex">
+                <a href="#about" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">About</a>
+                <a href="#skills" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Skills</a>
+                <a href="#experience" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Experience</a>
+                <a href="#projects" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Projects</a>
+                <a href="#contact" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Contact</a>
+            </div>
+            <!-- Mobile Menu Placeholder (Not implemented for this single-file layout complexity) -->
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-24">
+
+        <!-- 1. Hero Section -->
+        <section id="home" class="min-h-[80vh] flex flex-col justify-center items-center text-center pt-16">
+            <div class="animate-fade-in space-y-6">
+                <!-- Applied the 'font-display' class for Playfair Display -->
+                <h1 class="text-6xl sm:text-7xl lg:text-8xl font-extrabold text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-accent-blue to-accent-purple font-display">
+                    Vidusha Chathuranga
+                </h1>
+                
+                <!-- Dynamic Role Display (The new animated slider/roll section) -->
+                <div class="text-xl sm:text-2xl text-text-muted animate-slide-up animation-delay-300 flex justify-center items-center h-8 sm:h-10">
+                    <span class="mr-2 hidden sm:inline">I am a</span>
+                    <span id="role-text" class="font-bold text-accent-purple inline-block whitespace-nowrap overflow-hidden"></span>
+                </div>
+                <!-- End Dynamic Role Display -->
+
+                <a href="#projects" class="inline-block px-8 py-3 mt-8 text-lg font-semibold text-white bg-accent-purple rounded-full shadow-lg shadow-violet-500/50 hover:bg-violet-600 transition duration-300 transform hover:scale-105 animate-slide-up animation-delay-600">
+                    View My Work <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- 2. About/Profile Section -->
+        <section id="about" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-user-circle mr-3"></i> About Me
+            </h2>
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                <!-- Profile Summary (Left Column) -->
+                <div class="space-y-6 fade-in-scroll">
+                    <h3 class="text-2xl font-semibold text-text-light">My Professional Profile</h3>
+                    <p class="text-text-muted">
+                        As a dedicated and versatile student with a strong foundation in programming languages, 
+                        I am proficient in **Python, Java, and C#**. My practical experience includes building and 
+                        customizing websites as a **WordPress Developer**. I also have a keen eye for detail and 
+                        strong writing skills, which I leverage as a **Freelance Resume Writer** to create professional 
+                        and compelling profiles. I am eager to apply my technical and creative skills to challenging roles.
+                    </p>
+                    <p class="text-text-muted">
+                        Currently an undergraduate pursuing a Higher National Diploma in Information Technology at SLIATE 
+                        and completing a Full Stack Developer Course at the University of Moratuwa (CODL).
+                    </p>
+                </div>
+
+                <!-- Image + Personal Details + Languages (Right Column) -->
+                <div class="space-y-6"> 
+                    <!-- Profile Photo Card -->
+                    <div class="p-6 bg-secondary-dark rounded-xl shadow-xl fade-in-scroll flex justify-center transform transition duration-500 hover:scale-[1.05]">
+                        <!-- Profile Image Link -->
+                        <img 
+                            id="profile-photo"
+                            src="https://avatars.githubusercontent.com/u/114267552?v=4&size=64" 
+                            alt="Vidusha Chathuranga Profile Picture"
+                            class="w-48 h-48 object-cover rounded-full border-4 border-accent-purple shadow-2xl transition duration-500 hover:scale-105"
+                            onerror="this.onerror=null;this.src='https://placehold.co/200x200/94a3b8/0f172a/png?text=Image+Load+Failed';"
+                        >
+                    </div>
+
+                    <!-- Personal Details Card -->
+                    <div class="space-y-4 p-6 bg-secondary-dark rounded-xl shadow-xl fade-in-scroll">
+                        <h3 class="text-2xl font-semibold text-accent-purple">Bio Details</h3>
+                        <div class="space-y-3 text-text-light">
+                            <!-- Birthday (Date from Data) -->
+                            <p class="flex items-center space-x-3">
+                                <i class="fas fa-cake-candles text-accent-blue text-lg"></i>
+                                <span id="birth-date" class="font-bold"></span>
+                            </p>
+                            <!-- Age (Dynamic Value) -->
+                            <p class="flex items-center space-x-3">
+                                <i class="fas fa-calendar-alt text-accent-blue text-lg"></i>
+                                <span id="auto-age" class="font-bold"></span>
+                            </p>
+                            <!-- City (UPDATED to Kandy) -->
+                            <p class="flex items-center space-x-3">
+                                <i class="fas fa-map-marker-alt text-accent-blue text-lg"></i>
+                                <span class="font-bold">Kandy</span>
+                            </p>
+                            <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a334241" target="_blank" class="block w-full text-center py-2 mt-4 bg-accent-blue rounded-lg hover:bg-blue-600 transition duration-300 font-medium">
+                                View Full LinkedIn Profile <i class="fab fa-linkedin ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Languages Card -->
+                    <div class="space-y-4 p-6 bg-secondary-dark rounded-xl shadow-xl fade-in-scroll">
+                        <h3 class="text-2xl font-semibold text-accent-blue">Language Proficiency</h3>
+                        <div id="languages-container" class="space-y-4">
+                            <!-- Languages will be dynamically populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Skills Section -->
+        <section id="skills" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-code mr-3"></i> Core Skills
+            </h2>
+            <div id="skills-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+                <!-- Skills will be dynamically populated by JavaScript -->
+            </div>
+        </section>
+        
+        <!-- 4. Experience Section -->
+        <section id="experience" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-briefcase mr-3"></i> Work & Education
+            </h2>
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Work Experience Card -->
+                <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl space-y-4 border border-secondary-dark hover:border-accent-purple transition duration-500 fade-in-scroll">
+                    <h3 class="text-3xl font-bold text-text-light">Work Experience</h3>
+                    <!-- Item 1 -->
+                    <div class="border-l-4 border-accent-purple pl-4">
+                        <p class="text-accent-purple font-semibold">August 2025 - Present</p>
+                        <h4 class="text-xl font-bold text-white">WordPress Developer (Intern)</h4>
+                        <p class="text-text-muted">Allaboutwebservices.com Inc</p>
+                        <ul class="list-disc list-inside text-sm text-text-muted mt-2 space-y-1">
+                            <li>Managed and developed website content.</li>
+                            <li>Performed WordPress development and maintenance.</li>
+                            <li>Integrated various AI tools into web solutions.</li>
+                        </ul>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="border-l-4 border-accent-blue pl-4 mt-6">
+                        <p class="text-accent-blue font-semibold">2023 - Present</p>
+                        <h4 class="text-xl font-bold text-white">Freelance Resume Writing</h4>
+                        <p class="text-text-muted">Independent</p>
+                        <p class="text-sm text-text-muted mt-2">
+                            Crafted tailored resumes for clients across different industries, highlighting their skills, achievements, and qualifications.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Education Card (UPDATED WITH ICONS/LOGOS) -->
+                <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl space-y-4 border border-secondary-dark hover:border-accent-blue transition duration-500 fade-in-scroll">
+                    <h3 class="text-3xl font-bold text-text-light">Education & Training</h3>
+                    
+                    <!-- Item 1: SLIATE -->
+                    <div class="border-l-4 border-accent-blue pl-4">
+                        <p class="text-accent-blue font-semibold">2024 - Undergraduate</p>
+                        <!-- Added icon for SLIATE -->
+                        <h4 class="text-xl font-bold text-white flex items-center space-x-2">
+                            <i class="fas fa-graduation-cap text-accent-purple text-lg"></i>
+                            <span>Higher National Diploma in Information Technology</span>
+                        </h4>
+                        <p class="text-text-muted">SLIATE</p>
+                    </div>
+                    
+                    <!-- Item 2: University of Moratuwa (CODL) -->
+                    <div class="border-l-4 border-accent-purple pl-4 mt-6">
+                        <p class="text-accent-purple font-semibold">2024</p>
+                         <!-- Added icon for University of Moratuwa (CODL) -->
+                        <h4 class="text-xl font-bold text-white flex items-center space-x-2">
+                            <i class="fas fa-desktop text-accent-blue text-lg"></i>
+                            <span>FULL STACK DEVELOPER COURSE</span>
+                        </h4>
+                        <p class="text-text-muted">University of Moratuwa (CODL)</p>
+                    </div>
+                    
+                    <!-- Item 3: Jinaraja Boys Collage Gampola -->
+                    <div class="border-l-4 border-accent-purple pl-4 mt-6">
+                        <p class="text-accent-purple font-semibold">2023</p>
+                         <!-- Added icon for Jinaraja Boys Collage Gampola -->
+                        <h4 class="text-xl font-bold text-white flex items-center space-x-2">
+                            <i class="fas fa-school text-accent-purple text-lg"></i>
+                            <span>GCE ADVANCED LEVEL - Engineering Technology Stream</span>
+                        </h4>
+                        <p class="text-text-muted">Jinaraja Boys Collage Gampola</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Projects Section -->
+        <section id="projects" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-laptop-code mr-3"></i> Featured Projects
+            </h2>
+            <div id="projects-container" class="grid md:grid-cols-2 gap-10">
+                <!-- Projects will be dynamically populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- 6. Contact Section -->
+        <section id="contact" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-headset mr-3"></i> Get In Touch
+            </h2>
+            <!-- Increased grid columns to 4 for the new links -->
+            <div class="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center"> 
+                <!-- Contact Items will be dynamically populated by JavaScript -->
+            </div>
+            <p class="text-center text-text-muted mt-12 fade-in-scroll">
+                Located at: No. 180/2 Madagammadda Udagama Mahaudagama **Kandy**.
+            </p>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-primary-dark border-t border-secondary-dark mt-16 py-6 text-center text-text-muted">
+        <p>&copy; <span id="currentYear"></span> Vidusha Chathuranga. Built with <span class="text-red-500">&hearts;</span> and modern web technologies.</p>
+    </footer>
+
+    <script>
+        // =================================================================
+        // 1. Data Management (Easy to add/remove/edit content here)
+        // =================================================================
+
+        const portfolioData = {
+            profile: {
+                name: "Vidusha Chathuranga",
+                whatsappNumber: "94786217591", 
+                birthDate: "03/13/2004", // MM/DD/YYYY format for reliable calculation
+                city: "Kandy" 
+            },
+            // NEW: Array for the animated role display
+            roles: [
+                "Full Stack Aspirant",
+                "Versatile WordPress Developer",
+                "Professional Resume Writer"
+            ],
+            skills: [
+                { name: "Python", iconClass: "fab fa-python", color: "text-blue-400" },
+                { name: "Java", iconClass: "fab fa-java", color: "text-red-500" },
+                { name: "C# / .Net", iconClass: "fas fa-code", color: "text-purple-500" },
+                { name: "HTML5", iconClass: "fab fa-html5", color: "text-orange-500" },
+                { name: "CSS3", iconClass: "fab fa-css3-alt", color: "text-blue-500" },
+                { name: "JavaScript", iconClass: "fab fa-js-square", color: "text-yellow-500" },
+                { name: "SQL", iconClass: "fas fa-database", color: "text-indigo-400" },
+                { name: "Git / GitHub", iconClass: "fab fa-git-alt", color: "text-orange-700" }, 
+                { name: "WordPress/Wix", iconClass: "fab fa-wordpress", color: "text-blue-600" },
+                { name: "Canva/Adobe PS", iconClass: "fas fa-paint-brush", color: "text-pink-500" },
+                { name: "MS Office", iconClass: "fas fa-file-alt", color: "text-green-500" },
+                { name: "Resume Writing", iconClass: "fas fa-pen-fancy", color: "text-amber-500" },
+            ],
+            languages: [
+                { name: "Sinhala", proficiency: "Excellent", level: 100 },
+                { name: "English", proficiency: "Conversational", level: 65 },
+            ],
+            projects: [
+                {
+                    name: "C# POS System",
+                    description: "A complete Point-of-Sale (POS) system application designed for retail environments, focusing on efficient inventory management, transaction processing, and sales reporting using a robust backend database. This is a desktop application.",
+                    techStack: "C#, .NET Framework, SQL Server, WinForms/WPF",
+                    liveDemo: "https://github.com/Vidusha78978/POS-system-shop.git", 
+                    github: "https://github.com/Vidusha78978/POS-system-shop.git", 
+                    icon: "fas fa-cash-register"
+                },
+                {
+                    name: "Living Miniatures",
+                    description: "A functional WordPress E-Commerce website focused on selling small goods. Developed with a focus on user experience and conversion optimization.",
+                    techStack: "WordPress, WooCommerce, SEO tools, Plugins",
+                    liveDemo: "https://livingminiatures.wuaze.com/", 
+                    github: "", // GitHub link removed
+                    icon: "fas fa-shopping-cart"
+                },
+                {
+                    name: "Magicyarn - WooCommerce Store",
+                    description: "A custom-designed WooCommerce store focused on specialized products (e.g., crafts/yarn). Implemented secure payment gateways and inventory tracking for a seamless e-commerce experience.",
+                    techStack: "WordPress, WooCommerce, Payment Gateways, Inventory Management",
+                    liveDemo: "https://magicyarn.lovestoblog.com/", 
+                    github: "", // GitHub link removed
+                    icon: "fas fa-store" 
+                },
+                {
+                    name: "StudyNest",
+                    description: "An educational WordPress website designed for online learning. Integrated Learning Management System (LMS) plugins to provide a structured e-learning environment.",
+                    techStack: "WordPress, LMS Plugins (LearnDash/Tutor LMS)",
+                    liveDemo: "http://studynest.byethost14.com",
+                    github: "", // GitHub link removed
+                    icon: "fas fa-graduation-cap"
+                }
+            ],
+            contact: [
+                {
+                    title: "WhatsApp",
+                    details: "Message Me", 
+                    iconClass: "fab fa-whatsapp",
+                    link: `https://wa.me/${"94786217591"}`, 
+                    animationDelay: "delay-[100ms]",
+                    color: "bg-green-600 hover:bg-green-700"
+                },
+                {
+                    title: "Email",
+                    details: "Send an Email",
+                    iconClass: "fas fa-envelope",
+                    link: "mailto:vidushachathuranga78978@gmail.com",
+                    animationDelay: "delay-[200ms]",
+                    color: "bg-red-600 hover:bg-red-700"
+                },
+                {
+                    title: "LinkedIn",
+                    details: "Profile Link",
+                    iconClass: "fab fa-linkedin",
+                    link: "https://www.linkedin.com/in/vidusha-chathuranga-51a334241",
+                    animationDelay: "delay-[300ms]",
+                    color: "bg-blue-600 hover:bg-blue-700"
+                },
+                {
+                    title: "GitHub",
+                    details: "Code Profile",
+                    iconClass: "fab fa-github",
+                    link: "https://github.com/VidushaC", 
+                    animationDelay: "delay-[400ms]",
+                    color: "bg-gray-800 hover:bg-gray-700"
+                },
+                {
+                    title: "Facebook",
+                    details: "Social Profile",
+                    iconClass: "fab fa-facebook",
+                    link: "https://web.facebook.com/vidusha.chathuranga.2025",
+                    animationDelay: "delay-[500ms]",
+                    color: "bg-blue-800 hover:bg-blue-900"
+                }
+            ]
+        };
+
+        // =================================================================
+        // 2. Utility Functions
+        // =================================================================
+        
+        /**
+         * Calculates the current age based on a birthdate string (MM/DD/YYYY).
+         * @param {string} birthDateString - The date of birth in MM/DD/YYYY format.
+         * @returns {string} The calculated age followed by ' years old'.
+         */
+        function calculateAge(birthDateString) {
+            const today = new Date();
+            const parts = birthDateString.split('/');
+            // Date constructor: new Date(year, monthIndex, day)
+            const birthDate = new Date(parts[2], parts[0] - 1, parts[1]);
+            
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            
+            // Adjust age if birthday hasn't passed this year yet
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return `${age} years old`;
+        }
+
+        /**
+         * Implements the typewriter animation for roles.
+         * @param {string[]} roles - Array of strings to cycle through.
+         */
+        function startRoleAnimation(roles) {
+            const textElement = document.getElementById('role-text');
+            let roleIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            let speed = 150; 
+
+            function type() {
+                const currentRole = roles[roleIndex];
+                
+                if (isDeleting) {
+                    // Deleting state (faster speed)
+                    charIndex--;
+                    speed = 75; 
+                    textElement.textContent = currentRole.substring(0, charIndex);
+                } else {
+                    // Typing state (normal speed)
+                    charIndex++;
+                    speed = 150; 
+                    textElement.textContent = currentRole.substring(0, charIndex);
+                }
+
+                // State transitions
+                if (!isDeleting && charIndex === currentRole.length) {
+                    // Finished typing: Pause, then start deleting
+                    isDeleting = true;
+                    speed = 1500; // Pause duration
+                } else if (isDeleting && charIndex === 0) {
+                    // Finished deleting: Move to the next role
+                    isDeleting = false;
+                    roleIndex = (roleIndex + 1) % roles.length;
+                    speed = 500; // Short pause before starting next word
+                }
+
+                // Re-schedule the function call
+                setTimeout(type, speed);
+            }
+
+            // Start the animation loop
+            type();
+        }
+
+        // =================================================================
+        // 3. DOM Rendering Functions
+        // =================================================================
+
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // --- Render Skills ---
+        function renderSkills() {
+            const container = document.getElementById('skills-container');
+            container.innerHTML = portfolioData.skills.map((skill, index) => `
+                <div class="bg-secondary-dark p-6 rounded-xl shadow-lg flex flex-col items-center space-y-3 transform hover:scale-105 transition duration-300 border border-secondary-dark hover:border-accent-blue fade-in-scroll" style="transition-delay: ${index * 70}ms;">
+                    <i class="${skill.iconClass} ${skill.color} text-4xl"></i>
+                    <p class="text-text-light font-medium text-center">${skill.name}</p>
+                </div>
+            `).join('');
+        }
+        
+        // --- Render Languages ---
+        function renderLanguages() {
+            const container = document.getElementById('languages-container');
+            container.innerHTML = portfolioData.languages.map((lang, index) => `
+                <div class="fade-in-scroll" style="transition-delay: ${index * 100}ms;">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-text-light font-medium">${lang.name}</span>
+                        <span class="text-accent-purple text-sm font-semibold">${lang.proficiency}</span>
+                    </div>
+                    <!-- Proficiency Bar -->
+                    <div class="w-full bg-primary-dark rounded-full h-2.5">
+                        <div 
+                            class="bg-accent-purple h-2.5 rounded-full transition-all duration-1000 ease-out" 
+                            style="width: ${lang.level}%"
+                        ></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Render Projects ---
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = portfolioData.projects.map((project, index) => {
+                // Determine button text based on the nature of the project link
+                const isCodeRepo = project.liveDemo.includes('github') || project.liveDemo === '#';
+                const primaryButtonText = isCodeRepo ? 'View Source Code' : 'Live Demo';
+                
+                // Logic to conditionally render the GitHub button
+                const hasGithub = project.github && project.github !== '';
+                
+                // If there's no GitHub link, the primary button takes full width.
+                const liveDemoClass = hasGithub ? 'flex-1' : 'w-full';
+
+                // Generate the GitHub button HTML conditionally
+                const githubButtonHtml = hasGithub ? `
+                    <a href="${project.github}" target="_blank" class="flex-1 text-center py-2 border border-text-muted text-text-muted rounded-lg hover:bg-text-muted hover:text-primary-dark transition duration-300">
+                        <i class="fab fa-github mr-2"></i> GitHub Repository
+                    </a>
+                ` : '';
+
+                return `
+                <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl space-y-4 border border-secondary-dark transform transition duration-500 hover:scale-[1.02] hover:shadow-accent-purple/30 fade-in-scroll" style="transition-delay: ${index * 100}ms;">
+                    <div class="flex items-center space-x-4">
+                        <i class="${project.icon} text-3xl text-accent-purple"></i>
+                        <h3 class="text-2xl font-bold text-text-light">${project.name}</h3>
+                    </div>
+                    <p class="text-text-muted">${project.description}</p>
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        ${project.techStack.split(', ').map(tech => `<span class="px-3 py-1 bg-primary-dark text-accent-blue rounded-full">${tech}</span>`).join('')}
+                    </div>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="${project.liveDemo}" target="_blank" class="${liveDemoClass} text-center py-2 border border-accent-blue text-accent-blue rounded-lg hover:bg-accent-blue hover:text-white transition duration-300">
+                            <i class="fas ${isCodeRepo ? 'fas fa-code' : 'fas fa-external-link-alt'} mr-2"></i> ${primaryButtonText}
+                        </a>
+                        ${githubButtonHtml}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // --- Render Contact ---
+        function renderContact() {
+            const container = document.getElementById('contact');
+            const grid = container.querySelector('div');
+
+            grid.innerHTML = portfolioData.contact.map((item, index) => `
+                <a href="${item.link}" target="_blank" class="p-6 rounded-xl shadow-xl space-y-3 transform transition duration-500 hover:scale-110 hover:shadow-lg ${item.color} text-white fade-in-scroll" style="transition-delay: ${index * 150}ms;">
+                    <i class="${item.iconClass} text-5xl transform hover:rotate-6 transition duration-300"></i>
+                    <h4 class="text-xl font-bold">${item.title}</h4>
+                    <p class="text-sm font-light opacity-90">${item.details}</p>
+                </a>
+            `).join('');
+        }
+        
+        /**
+         * NEW FUNCTION: Renders the walking smiley face carrying skill icons.
+         */
+        function renderSkillWalker() {
+            const container = document.getElementById('skill-walker-animation');
+            const skillsToCarry = portfolioData.skills.slice(0, 6); // Select top 6 skills for the animation
+
+            const skillIconsHtml = skillsToCarry.map((skill, index) => {
+                // Determine position based on index 
+                let positionClass = '';
+                switch (index) {
+                    case 0: positionClass = 'top-[-10px] left-[-10px]'; break; // Python
+                    case 1: positionClass = 'top-[-15px] right-[-10px]'; break; // Java
+                    case 2: positionClass = 'bottom-[-10px] left-[-15px]'; break; // C#
+                    case 3: positionClass = 'bottom-[-10px] right-[-10px]'; break; // HTML
+                    case 4: positionClass = 'top-[10px] left-[-30px]'; break; // CSS
+                    case 5: positionClass = 'bottom-[10px] right-[-30px]'; break; // JS
+                }
+
+                return `
+                    <div class="absolute ${positionClass} p-1 bg-secondary-dark rounded-full shadow-lg border border-accent-purple animate-skill-wobble" style="animation-duration: 2s; animation-delay: ${index * 0.3}s;">
+                        <i class="${skill.iconClass} ${skill.color} text-xl"></i>
+                    </div>
+                `;
+            }).join('');
+
+            // The main smiley face, positioned in the center of the container
+            container.innerHTML = `
+                <div class="relative w-20 h-20 flex items-center justify-center">
+                    <!-- The smiling face (using a large emoji) -->
+                    <span class="text-6xl" role="img" aria-label="Smiling Face">😀</span>
+                    
+                    <!-- Attached Skill Icons -->
+                    ${skillIconsHtml}
+
+                    <!-- Title tag -->
+                    <span class="absolute bottom-[-20px] text-xs text-text-muted bg-secondary-dark px-2 py-0.5 rounded-lg shadow-inner">My Skills</span>
+                </div>
+            `;
+        }
+
+
+        // =================================================================
+        // 4. Animation and Interaction Logic (Fade on Scroll)
+        // =================================================================
+        
+        // Options for the Intersection Observer
+        const appearOptions = {
+            threshold: 0,
+            rootMargin: "0px 0px -100px 0px" // Start 100px before reaching the element
+        };
+
+        const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    return;
+                }
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            });
+        }, appearOptions);
+
+
+        // =================================================================
+        // 5. Tone.js Ambient Music Generator
+        // =================================================================
+        let synth = null;
+        let isPlaying = false;
+        const musicToggle = document.getElementById('musicToggle');
+        const musicIcon = document.getElementById('musicIcon');
+
+        function startAmbientSound() {
+            // Tone.js requires a context start, triggered by user interaction
+            Tone.start();
+
+            if (!synth) {
+                // Create a soft, ambient Pad/Drone sound using FMSynth for a more professional tone
+                synth = new Tone.FMSynth({
+                    volume: -24, // Very low volume (low sound)
+                    harmonicity: 0.8,
+                    modulationIndex: 10,
+                    oscillator: { type: "sine" },
+                    envelope: {
+                        attack: 8,      // Very slow attack for a smooth start
+                        decay: 0.5,
+                        sustain: 0.8,
+                        release: 10     // Very slow release for a smooth decay
+                    },
+                    modulation: { type: "square" },
+                    modulationEnvelope: { attack: 1, decay: 0, sustain: 1, release: 0.5 }
+                }).toDestination();
+                
+                // Create a repeating loop of a calming G minor chord (G3, Bb3, D4)
+                const loop = new Tone.Loop(time => {
+                    // Plays G minor slowly every eight seconds (8n is slow with bpm 30)
+                    synth.triggerAttackRelease(["G3", "Bb3", "D4"], "8n", time);
+                }, "8n").start(0); // Start immediately on loop creation
+
+                // Set a very slow tempo for a calm feel
+                Tone.Transport.bpm.value = 30; 
+                Tone.Transport.start();
+            }
+
+            // Ensure volume is correctly set to low and state is updated
+            synth.volume.value = -24; 
+            isPlaying = true;
+            musicIcon.classList.remove('fa-volume-mute');
+            musicIcon.classList.add('fa-volume-up');
+        }
+
+        function stopAmbientSound() {
+            if (synth) {
+                // Set volume to -100 to effectively mute the sound softly
+                synth.volume.value = -100; 
+                isPlaying = false;
+                musicIcon.classList.remove('fa-volume-up');
+                musicIcon.classList.add('fa-volume-mute');
+            }
+        }
+
+        musicToggle.addEventListener('click', () => {
+            if (isPlaying) {
+                stopAmbientSound();
+            } else {
+                startAmbientSound();
+            }
+        });
+
+        // Initialize icon as muted before user interaction
+        musicIcon.classList.remove('fa-volume-up');
+        musicIcon.classList.add('fa-volume-mute');
+
+        // =================================================================
+        // 6. Initialisation
+        // =================================================================
+
+        window.onload = function() {
+            // 1. Render all dynamic content FIRST
+            renderSkills();
+            renderLanguages(); 
+            renderProjects(); 
+            renderContact();
+            
+            // 2. NEW: Render the Skill Walker Animation
+            renderSkillWalker();
+
+            // 3. Start the Role Typewriter Animation
+            startRoleAnimation(portfolioData.roles);
+
+            // 4. Set the static birthday and calculated age
+            document.getElementById('birth-date').textContent = portfolioData.profile.birthDate;
+            document.getElementById('auto-age').textContent = calculateAge(portfolioData.profile.birthDate);
+
+            // 5. Query for all elements that need the fade-in-scroll animation
+            const faders = document.querySelectorAll('.fade-in-scroll');
+            faders.forEach(fader => {
+                appearOnScroll.observe(fader);
+            });
+
+        };
+
+        // Smooth Scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+
