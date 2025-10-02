@@ -45,7 +45,7 @@
                         },
                         slideUp: {
                             '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '0', },
+                            '100%': { transform: 'translateY(0)', opacity: '0' },
                         },
                     }
                 }
@@ -197,23 +197,15 @@
                 <div class="space-y-6"> 
                     <!-- Profile Photo Card -->
                     <div class="p-6 bg-secondary-dark rounded-xl shadow-xl fade-in-scroll flex justify-center transform transition duration-500 hover:scale-[1.05]">
-                        <!-- Profile Image Link - UPDATED WITH PROVIDED URL -->
+                        <!-- Profile Image Link - UPDATED: Now clickable and links to LinkedIn -->
                         <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a334241" target="_blank" aria-label="View LinkedIn Profile">
-                            <div id="profile-picture-container" class="w-48 h-48 rounded-full border-4 border-accent-purple shadow-2xl flex items-center justify-center bg-primary-dark transition duration-500 hover:scale-105 overflow-hidden">
-                                <img 
-                                    id="profile-image"
-                                    src="https://media.licdn.com/dms/image/v2/D5635AQEafZxpCG_jBQ/profile-framedphoto-shrink_200_200/B56Zmfawb9H8AY-/0/1759316215852?e=1759924800&v=beta&t=t2d4BAjRbchoHlP6XLPQqQXyw7V_922k7g0uzjXEOVU" 
-                                    alt="Vidusha Chathuranga Profile Picture" 
-                                    class="w-full h-full object-cover"
-                                    onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='block';"
-                                >
-                                <!-- Fallback Icon (initially hidden) -->
-                                <i 
-                                    id="fallback-icon"
-                                    class="fas fa-user-tie text-7xl text-accent-purple"
-                                    style="display: none;"
-                                ></i>
-                            </div>
+                            <img 
+                                id="profile-photo"
+                                src="https://media.licdn.com/media/AAYQAQSOAAgAAQAAAAAAAB-zrMZEDXI2T62PSuT6kpB6qg.png" 
+                                alt="Vidusha Chathuranga Profile Picture"
+                                class="w-48 h-48 object-cover rounded-full border-4 border-accent-purple shadow-2xl transition duration-500 hover:scale-105"
+                                onerror="this.onerror=null;this.src='https://placehold.co/200x200/94a3b8/0f172a/png?text=Image+Load+Failed';"
+                            >
                         </a>
                     </div>
 
@@ -468,3 +460,379 @@
                     color: "bg-accent-purple hover:bg-violet-600"
                 },
                 {
+                    title: "WhatsApp",
+                    details: "Message Me", 
+                    iconClass: "fab fa-whatsapp",
+                    link: `https://wa.me/${"94786217591"}`, 
+                    animationDelay: "delay-[200ms]",
+                    color: "bg-green-600 hover:bg-green-700"
+                },
+                {
+                    title: "Email",
+                    details: "Send an Email",
+                    iconClass: "fas fa-envelope",
+                    link: "mailto:vidushachathuranga78978@gmail.com",
+                    animationDelay: "delay-[300ms]",
+                    color: "bg-red-600 hover:bg-red-700"
+                },
+                {
+                    title: "LinkedIn",
+                    details: "Profile Link",
+                    iconClass: "fab fa-linkedin",
+                    link: "https://www.linkedin.com/in/vidusha-chathuranga-51a334241",
+                    animationDelay: "delay-[400ms]",
+                    color: "bg-blue-600 hover:bg-blue-700"
+                },
+                {
+                    title: "GitHub",
+                    details: "Code Profile",
+                    iconClass: "fab fa-github",
+                    link: "https://github.com/VidushaC", 
+                    animationDelay: "delay-[500ms]",
+                    color: "bg-gray-800 hover:bg-gray-700"
+                },
+                {
+                    title: "Facebook",
+                    details: "Social Profile",
+                    iconClass: "fab fa-facebook",
+                    link: "https://web.facebook.com/vidusha.chathuranga.2025",
+                    animationDelay: "delay-[600ms]",
+                    color: "bg-blue-800 hover:bg-blue-900"
+                }
+            ]
+        };
+
+        // =================================================================
+        // 2. Utility Functions
+        // =================================================================
+        
+        /**
+         * Calculates the current age based on a birthdate string (MM/DD/YYYY).
+         * @param {string} birthDateString - The date of birth in MM/DD/YYYY format.
+         * @returns {string} The calculated age followed by ' years old'.
+         */
+        function calculateAge(birthDateString) {
+            const today = new Date();
+            const parts = birthDateString.split('/');
+            // Date constructor: new Date(year, monthIndex, day)
+            const birthDate = new Date(parts[2], parts[0] - 1, parts[1]);
+            
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            
+            // Adjust age if birthday hasn't passed this year yet
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return `${age} years old`;
+        }
+
+        /**
+         * Implements the typewriter animation for roles.
+         * @param {string[]} roles - Array of strings to cycle through.
+         */
+        function startRoleAnimation(roles) {
+            const textElement = document.getElementById('role-text');
+            let roleIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            let speed = 150; 
+
+            function type() {
+                const currentRole = roles[roleIndex];
+                
+                if (isDeleting) {
+                    // Deleting state (faster speed)
+                    charIndex--;
+                    speed = 75; 
+                    textElement.textContent = currentRole.substring(0, charIndex);
+                } else {
+                    // Typing state (normal speed)
+                    charIndex++;
+                    speed = 150; 
+                    textElement.textContent = currentRole.substring(0, charIndex);
+                }
+
+                // State transitions
+                if (!isDeleting && charIndex === currentRole.length) {
+                    // Finished typing: Pause, then start deleting
+                    isDeleting = true;
+                    speed = 1500; // Pause duration
+                } else if (isDeleting && charIndex === 0) {
+                    // Finished deleting: Move to the next role
+                    isDeleting = false;
+                    roleIndex = (roleIndex + 1) % roles.length;
+                    speed = 500; // Short pause before starting next word
+                }
+
+                // Re-schedule the function call
+                setTimeout(type, speed);
+            }
+
+            // Start the animation loop
+            setTimeout(type, 500); // Initial delay before starting
+        }
+
+        // =================================================================
+        // 3. DOM Rendering Functions
+        // =================================================================
+
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // --- Render Skills ---
+        function renderSkills() {
+            const container = document.getElementById('skills-container');
+            container.innerHTML = portfolioData.skills.map((skill, index) => `
+                <!-- The container below uses:
+                     - hover:bg-accent-purple to change the card's background color.
+                     - hover:border-accent-purple to change the card's border color.
+                     - group class to enable group-hover state changes for nested elements.
+                -->
+                <div class="bg-secondary-dark p-6 rounded-xl shadow-lg flex flex-col items-center space-y-3 transform hover:scale-105 transition duration-300 border border-secondary-dark hover:border-accent-purple hover:bg-accent-purple fade-in-scroll group" style="transition-delay: ${index * 70}ms;">
+                    <!-- Icon color changes to white on hover using group-hover:text-white -->
+                    <i class="${skill.iconClass} ${skill.color} text-4xl transition duration-300 group-hover:text-white"></i>
+                    <!-- Text color changes to white on hover using group-hover:text-white -->
+                    <p class="text-text-light font-medium text-center transition duration-300 group-hover:text-white">${skill.name}</p>
+                </div>
+            `).join('');
+        }
+        
+        // --- Render Languages ---
+        function renderLanguages() {
+            const container = document.getElementById('languages-container');
+            container.innerHTML = portfolioData.languages.map((lang, index) => `
+                <div class="fade-in-scroll" style="transition-delay: ${index * 100}ms;">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-text-light font-medium">${lang.name}</span>
+                        <span class="text-accent-purple text-sm font-semibold">${lang.proficiency}</span>
+                    </div>
+                    <!-- Proficiency Bar -->
+                    <div class="w-full bg-primary-dark rounded-full h-2.5">
+                        <div 
+                            class="bg-accent-purple h-2.5 rounded-full transition-all duration-1000 ease-out" 
+                            style="width: ${lang.level}%"
+                        ></div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Render Projects ---
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            container.innerHTML = portfolioData.projects.map((project, index) => {
+                // Determine button text based on the nature of the project link
+                const isCodeRepo = project.liveDemo.includes('github') || project.liveDemo === '#';
+                const primaryButtonText = isCodeRepo ? 'View Source Code' : 'Live Demo';
+                
+                // Logic to conditionally render the GitHub button
+                const hasGithub = project.github && project.github !== '';
+                
+                // If there's no GitHub link, the primary button takes full width.
+                const liveDemoClass = hasGithub ? 'flex-1' : 'w-full';
+
+                // Generate the GitHub button HTML conditionally
+                const githubButtonHtml = hasGithub ? `
+                    <a href="${project.github}" target="_blank" class="flex-1 text-center py-2 border border-text-muted text-text-muted rounded-lg hover:bg-text-muted hover:text-primary-dark transition duration-300">
+                        <i class="fab fa-github mr-2"></i> GitHub Repository
+                    </a>
+                ` : '';
+
+                return `
+                <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl space-y-4 border border-secondary-dark transform transition duration-500 hover:scale-[1.02] hover:shadow-accent-purple/30 fade-in-scroll" style="transition-delay: ${index * 100}ms;">
+                    <div class="flex items-center space-x-4">
+                        <i class="${project.icon} text-3xl text-accent-purple"></i>
+                        <h3 class="text-2xl font-bold text-text-light">${project.name}</h3>
+                    </div>
+                    <p class="text-text-muted">${project.description}</p>
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        ${project.techStack.split(', ').map(tech => `<span class="px-3 py-1 bg-primary-dark text-accent-blue rounded-full">${tech}</span>`).join('')}
+                    </div>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="${project.liveDemo}" target="_blank" class="${liveDemoClass} text-center py-2 border border-accent-blue text-accent-blue rounded-lg hover:bg-accent-blue hover:text-white transition duration-300">
+                            <i class="fas ${isCodeRepo ? 'fas fa-code' : 'fas fa-external-link-alt'} mr-2"></i> ${primaryButtonText}
+                        </a>
+                        ${githubButtonHtml}
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // --- Render Contact ---
+        function renderContact() {
+            const grid = document.querySelector('#contact > div.grid');
+
+            // NOTE: Grid columns changed to lg:grid-cols-5 after removing the Certifications card.
+            grid.innerHTML = portfolioData.contact.map((item, index) => {
+                // Determine if we need to add a 'download' attribute for the resume link
+                const isResumeLink = item.title === 'Resume';
+                // For the new /uc?id= link, we use the `download` attribute to suggest a file name.
+                const downloadAttribute = isResumeLink ? 'download="Vidusha_Chathuranga_Resume.pdf"' : ''; 
+
+                return `
+                <a href="${item.link}" target="_blank" ${downloadAttribute} class="p-6 rounded-xl shadow-xl space-y-3 transform transition duration-500 hover:scale-110 hover:shadow-lg ${item.color} text-white fade-in-scroll" style="transition-delay: ${index * 150}ms;">
+                    <i class="${item.iconClass} text-5xl transform hover:rotate-6 transition duration-300"></i>
+                    <h4 class="text-xl font-bold">${item.title}</h4>
+                    <p class="text-sm font-light opacity-90">${item.details}</p>
+                </a>
+                `;
+            }).join('');
+        }
+
+        // =================================================================
+        // 4. Animation and Interaction Logic (Fade on Scroll)
+        // =================================================================
+        
+        // Options for the Intersection Observer
+        const appearOptions = {
+            threshold: 0,
+            rootMargin: "0px 0px -100px 0px" // Start 100px before reaching the element
+        };
+
+        const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    return;
+                }
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            });
+        }, appearOptions);
+
+
+        // =================================================================
+        // 5. Welcome Modal Logic
+        // =================================================================
+        const welcomeModal = document.getElementById('welcome-modal');
+
+        /** Shows the welcome modal with an animation */
+        function showWelcomeModal() {
+            welcomeModal.classList.remove('hidden', 'modal-exit-active');
+            welcomeModal.classList.add('modal-enter-active');
+            
+            // Set a timer to automatically dismiss the modal after 4 seconds
+            setTimeout(hideWelcomeModal, 4000); 
+        }
+
+        /** Hides the welcome modal with an animation */
+        function hideWelcomeModal() {
+            welcomeModal.classList.remove('modal-enter-active');
+            welcomeModal.classList.add('modal-exit-active');
+            
+            // Fully hide the modal after the transition finishes (0.5s)
+            setTimeout(() => {
+                welcomeModal.classList.add('hidden');
+            }, 500); 
+        }
+
+        // =================================================================
+        // 6. Tone.js Ambient Music Generator
+        // =================================================================
+        let synth = null;
+        let isPlaying = false;
+        const musicToggle = document.getElementById('musicToggle');
+        const musicIcon = document.getElementById('musicIcon');
+
+        function startAmbientSound() {
+            // Tone.js requires a context start, triggered by user interaction
+            Tone.start();
+
+            if (!synth) {
+                // Create a soft, ambient Pad/Drone sound using FMSynth for a more professional tone
+                synth = new Tone.FMSynth({
+                    volume: -24, // Very low volume (low sound)
+                    harmonicity: 0.8,
+                    modulationIndex: 10,
+                    oscillator: { type: "sine" },
+                    envelope: {
+                        attack: 8,      // Very slow attack for a smooth start
+                        decay: 0.5,
+                        sustain: 0.8,
+                        release: 10     // Very slow release for a smooth decay
+                    },
+                    modulation: { type: "square" },
+                    modulationEnvelope: { attack: 1, decay: 0, sustain: 1, release: 0.5 }
+                }).toDestination();
+                
+                // Create a repeating loop of a calming G minor chord (G3, Bb3, D4)
+                const loop = new Tone.Loop(time => {
+                    // Plays G minor slowly every eight seconds (8n is slow with bpm 30)
+                    synth.triggerAttackRelease(["G3", "Bb3", "D4"], "8n", time);
+                }, "8n").start(0); // Start immediately on loop creation
+
+                // Set a very slow tempo for a calm feel
+                Tone.Transport.bpm.value = 30; 
+                Tone.Transport.start();
+            }
+
+            // Ensure volume is correctly set to low and state is updated
+            synth.volume.value = -24; 
+            isPlaying = true;
+            musicIcon.classList.remove('fa-volume-mute');
+            musicIcon.classList.add('fa-volume-up');
+        }
+
+        function stopAmbientSound() {
+            if (synth) {
+                // Set volume to -100 to effectively mute the sound softly
+                synth.volume.value = -100; 
+                isPlaying = false;
+                musicIcon.classList.remove('fa-volume-up');
+                musicIcon.classList.add('fa-volume-mute');
+            }
+        }
+
+        musicToggle.addEventListener('click', () => {
+            if (isPlaying) {
+                stopAmbientSound();
+            } else {
+                startAmbientSound();
+            }
+        });
+
+        // Initialize icon as muted before user interaction
+        musicIcon.classList.remove('fa-volume-up');
+        musicIcon.classList.add('fa-volume-mute');
+
+        // =================================================================
+        // 7. Initialisation
+        // =================================================================
+
+        window.onload = function() {
+            // 1. Render all dynamic content
+            renderSkills();
+            renderLanguages(); 
+            renderProjects(); 
+            renderContact();
+            
+            // 2. Start the Role Typewriter Animation
+            startRoleAnimation(portfolioData.roles);
+
+            // 3. Set the static birthday and calculated age
+            document.getElementById('birth-date').textContent = portfolioData.profile.birthDate;
+            document.getElementById('auto-age').textContent = calculateAge(portfolioData.profile.birthDate);
+
+            // 4. Show the Welcome Modal
+            showWelcomeModal();
+
+            // 5. Query for all elements that need the fade-in-scroll animation
+            const faders = document.querySelectorAll('.fade-in-scroll');
+            faders.forEach(fader => {
+                appearOnScroll.observe(fader);
+            });
+
+        };
+
+        // Smooth Scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
