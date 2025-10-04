@@ -116,7 +116,6 @@
             <p class="text-text-light mb-6">
                 I'm glad you stopped by! Feel free to explore my projects and skills.
             </p>
-            <!-- UPDATED: Removed timer dependency from modal close button -->
             <button onclick="hideWelcomeModal()" class="px-6 py-2 bg-accent-blue text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
                 Start Exploring <i class="fas fa-arrow-right ml-1"></i>
             </button>
@@ -132,8 +131,10 @@
     <!-- Header & Navigation -->
     <header class="sticky top-0 z-40 bg-primary-dark/95 backdrop-blur-sm shadow-lg border-b border-secondary-dark">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- Internal link, no target="_blank" -->
             <a href="#home" class="text-2xl font-bold text-accent-blue hover:text-accent-purple transition duration-300">Vidusha C.</a>
             <div class="space-x-4 hidden md:flex">
+                <!-- Internal links, no target="_blank" -->
                 <a href="#about" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">About</a>
                 <a href="#skills" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Skills</a>
                 <a href="#experience" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Experience</a>
@@ -161,6 +162,7 @@
                 </div>
                 <!-- End Dynamic Role Display -->
 
+                <!-- Internal link, no target="_blank" -->
                 <a href="#projects" class="inline-block px-8 py-3 mt-8 text-lg font-semibold text-white bg-accent-purple rounded-full shadow-lg shadow-violet-500/50 hover:bg-violet-600 transition duration-300 transform hover:scale-105 animate-slide-up animation-delay-600">
                     View My Work <i class="fas fa-arrow-right ml-2"></i>
                 </a>
@@ -193,7 +195,8 @@
                 <div class="space-y-6"> 
                     <!-- Profile Photo Card -->
                     <div class="p-6 bg-secondary-dark rounded-xl shadow-xl fade-in-scroll flex justify-center transform transition duration-500 hover:scale-[1.05]">
-                        <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a334241" target="_blank" aria-label="View LinkedIn Profile">
+                        <!-- External link: Added target="_blank" -->
+                        <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a334241" target="_blank" class="block" aria-label="View LinkedIn Profile">
                             <div id="profile-picture-container" class="w-48 h-48 rounded-full border-4 border-accent-purple shadow-2xl flex items-center justify-center bg-primary-dark transition duration-500 hover:scale-105 overflow-hidden">
                                 <img 
                                     id="profile-image"
@@ -231,6 +234,7 @@
                                 <i class="fas fa-map-marker-alt text-accent-blue text-lg"></i>
                                 <span class="font-bold">Kandy</span>
                             </p>
+                            <!-- External link: Added target="_blank" -->
                             <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a334241" target="_blank" class="block w-full text-center py-2 mt-4 bg-accent-blue rounded-lg hover:bg-blue-600 transition duration-300 font-medium">
                                 View Full LinkedIn Profile <i class="fab fa-linkedin ml-2"></i>
                             </a>
@@ -340,7 +344,7 @@
                 <p class="text-text-light font-medium">
                     Please click the button below to view the full, verified list of my licenses and certifications directly on my LinkedIn profile.
                 </p>
-                <!-- Button that takes them to the specific LinkedIn section -->
+                <!-- External link: Added target="_blank" -->
                 <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a334241/details/certifications/" target="_blank" class="inline-block px-8 py-3 text-lg font-semibold text-white bg-accent-purple rounded-full shadow-lg shadow-violet-500/50 hover:bg-violet-600 transition duration-300 transform hover:scale-105">
                     View Certifications on LinkedIn <i class="fas fa-external-link-alt ml-2"></i>
                 </a>
@@ -481,10 +485,11 @@
                     color: "bg-blue-600 hover:bg-blue-700"
                 },
                 {
+                    // >>> UPDATED GITHUB LINK HERE <<<
                     title: "GitHub",
                     details: "Code Profile",
                     iconClass: "fab fa-github",
-                    link: "https://github.com/VidushaC", 
+                    link: "https://github.com/Vidusha78978", 
                     animationDelay: "delay-[500ms]",
                     color: "bg-gray-800 hover:bg-gray-700"
                 },
@@ -648,6 +653,7 @@
                             ${project.techStack.split(', ').map(tech => `<span class="px-3 py-1 bg-primary-dark text-accent-blue rounded-full">${tech}</span>`).join('')}
                         </div>
                         <div class="flex space-x-4 mt-4">
+                            <!-- External link: Added target="_blank" -->
                             <a href="${project.liveDemo}" target="_blank" class="${liveDemoClass} text-center py-2 border border-accent-blue text-accent-blue rounded-lg hover:bg-accent-blue hover:text-white transition duration-300">
                                 <i class="fas ${isCodeRepo ? 'fas fa-code' : 'fas fa-external-link-alt'} mr-2"></i> ${primaryButtonText}
                             </a>
@@ -670,7 +676,8 @@
                 grid.innerHTML = portfolioData.contact.map((item, index) => {
                     const isResumeLink = item.title === 'Resume';
                     const downloadAttribute = isResumeLink ? 'download="Vidusha_Chathuranga_Resume.pdf"' : ''; 
-
+                    
+                    // Added target="_blank" to all dynamically generated contact links
                     return `
                     <a href="${item.link}" target="_blank" ${downloadAttribute} class="p-6 rounded-xl shadow-xl space-y-3 transform transition duration-500 hover:scale-110 hover:shadow-lg ${item.color} text-white fade-in-scroll" style="transition-delay: ${index * 150}ms;">
                         <i class="${item.iconClass} text-5xl transform hover:rotate-6 transition duration-300"></i>
@@ -849,7 +856,7 @@
             }
         };
 
-        // Smooth Scrolling for internal links
+        // Smooth Scrolling for internal links (Crucial: prevents internal links from opening new tabs)
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
