@@ -13,7 +13,7 @@
     <!-- Load Tone.js for ambient music -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     
-    <!-- NEW: Import Playfair Display from Google Fonts for a professional headline style -->
+    <!-- Import Playfair Display from Google Fonts for a professional headline style -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 
     <style>
@@ -31,7 +31,6 @@
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
-                        // Define 'display' font for the name
                         display: ['"Playfair Display"', 'serif'],
                     },
                     animation: {
@@ -62,15 +61,14 @@
         }
 
         /* Utility for fade-on-scroll: MUST be styled with initial opacity 0 */
-        /* UPDATED: Added rotation and scale for a "curly" entering animation */
         .fade-in-scroll {
             opacity: 0;
-            transform: translateY(30px) rotate(-3deg) scale(0.98); /* Start lower, slightly rotated and scaled down */
-            transition: opacity 0.7s ease-out, transform 0.7s ease-out; /* Longer transition for smoothness */
+            transform: translateY(30px) rotate(-3deg) scale(0.98); 
+            transition: opacity 0.7s ease-out, transform 0.7s ease-out; 
         }
         .fade-in-scroll.visible {
             opacity: 1;
-            transform: translateY(0) rotate(0deg) scale(1); /* End at original position */
+            transform: translateY(0) rotate(0deg) scale(1); 
         }
 
         /* Custom Scrollbar for a sleek look */
@@ -110,7 +108,7 @@
 </head>
 <body class="font-sans">
 
-    <!-- NEW: Welcome Greeting Modal -->
+    <!-- Welcome Greeting Modal -->
     <div id="welcome-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-primary-dark/80 backdrop-blur-sm modal-enter hidden">
         <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border-2 border-accent-purple transform transition duration-500">
             <i class="fas fa-hand-wave text-5xl text-accent-blue mb-4 animate-bounce-once"></i>
@@ -118,6 +116,7 @@
             <p class="text-text-light mb-6">
                 I'm glad you stopped by! Feel free to explore my projects and skills.
             </p>
+            <!-- UPDATED: Removed timer dependency from modal close button -->
             <button onclick="hideWelcomeModal()" class="px-6 py-2 bg-accent-blue text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
                 Start Exploring <i class="fas fa-arrow-right ml-1"></i>
             </button>
@@ -126,7 +125,6 @@
     <!-- END Welcome Greeting Modal -->
 
     <!-- Ambient Music Toggle Button (Click this to start the music!) -->
-    <!-- This remains fixed to the viewport -->
     <button id="musicToggle" class="fixed bottom-4 right-4 z-50 p-3 rounded-full bg-accent-purple text-white shadow-lg transition duration-300 hover:bg-violet-600 focus:outline-none focus:ring-4 focus:ring-violet-300 transform hover:scale-105" aria-label="Toggle ambient music">
         <i class="fas fa-volume-mute" id="musicIcon"></i>
     </button>
@@ -139,12 +137,11 @@
                 <a href="#about" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">About</a>
                 <a href="#skills" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Skills</a>
                 <a href="#experience" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Experience</a>
-                <!-- UPDATED NAVIGATION LINK -->
                 <a href="#licenses-certs" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Licenses</a>
                 <a href="#projects" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Projects</a>
                 <a href="#contact" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Contact</a>
             </div>
-            <!-- Mobile Menu Placeholder (Not implemented for this single-file layout complexity) -->
+            <!-- Mobile Menu Placeholder -->
         </nav>
     </header>
 
@@ -153,12 +150,11 @@
         <!-- 1. Hero Section -->
         <section id="home" class="min-h-[80vh] flex flex-col justify-center items-center text-center pt-16">
             <div class="animate-fade-in space-y-6">
-                <!-- Applied the 'font-display' class for Playfair Display -->
                 <h1 class="text-6xl sm:text-7xl lg:text-8xl font-extrabold text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-accent-blue to-accent-purple font-display">
                     Vidusha Chathuranga
                 </h1>
                 
-                <!-- Dynamic Role Display (The new animated slider/roll section) -->
+                <!-- Dynamic Role Display -->
                 <div class="text-xl sm:text-2xl text-text-muted animate-slide-up animation-delay-300 flex justify-center items-center h-8 sm:h-10">
                     <span class="mr-2 hidden sm:inline">I am a</span>
                     <span id="role-text" class="font-bold text-accent-purple inline-block whitespace-nowrap overflow-hidden"></span>
@@ -197,7 +193,6 @@
                 <div class="space-y-6"> 
                     <!-- Profile Photo Card -->
                     <div class="p-6 bg-secondary-dark rounded-xl shadow-xl fade-in-scroll flex justify-center transform transition duration-500 hover:scale-[1.05]">
-                        <!-- Profile Image Link - UPDATED WITH NEW IMAGE URL -->
                         <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a334241" target="_blank" aria-label="View LinkedIn Profile">
                             <div id="profile-picture-container" class="w-48 h-48 rounded-full border-4 border-accent-purple shadow-2xl flex items-center justify-center bg-primary-dark transition duration-500 hover:scale-105 overflow-hidden">
                                 <img 
@@ -231,7 +226,7 @@
                                 <i class="fas fa-calendar-alt text-accent-blue text-lg"></i>
                                 <span id="auto-age" class="font-bold"></span>
                             </p>
-                            <!-- City (UPDATED to Kandy) -->
+                            <!-- City (Kandy) -->
                             <p class="flex items-center space-x-3">
                                 <i class="fas fa-map-marker-alt text-accent-blue text-lg"></i>
                                 <span class="font-bold">Kandy</span>
@@ -294,14 +289,13 @@
                     </div>
                 </div>
 
-                <!-- Education Card (UPDATED WITH ICONS/LOGOS) -->
+                <!-- Education Card -->
                 <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl space-y-4 border border-secondary-dark hover:border-accent-blue transition duration-500 fade-in-scroll">
                     <h3 class="text-3xl font-bold text-text-light">Education & Training</h3>
                     
                     <!-- Item 1: SLIATE -->
                     <div class="border-l-4 border-accent-blue pl-4">
                         <p class="text-accent-blue font-semibold">2024 - Undergraduate</p>
-                        <!-- Added icon for SLIATE -->
                         <h4 class="text-xl font-bold text-white flex items-center space-x-2">
                             <i class="fas fa-graduation-cap text-accent-purple text-lg"></i>
                             <span>Higher National Diploma in Information Technology</span>
@@ -312,7 +306,6 @@
                     <!-- Item 2: University of Moratuwa (CODL) -->
                     <div class="border-l-4 border-accent-purple pl-4 mt-6">
                         <p class="text-accent-purple font-semibold">2024</p>
-                         <!-- Added icon for University of Moratuwa (CODL) -->
                         <h4 class="text-xl font-bold text-white flex items-center space-x-2">
                             <i class="fas fa-desktop text-accent-blue text-lg"></i>
                             <span>FULL STACK DEVELOPER COURSE</span>
@@ -323,7 +316,6 @@
                     <!-- Item 3: Jinaraja Boys Collage Gampola -->
                     <div class="border-l-4 border-accent-purple pl-4 mt-6">
                         <p class="text-accent-purple font-semibold">2023</p>
-                         <!-- Added icon for Jinaraja Boys Collage Gampola -->
                         <h4 class="text-xl font-bold text-white flex items-center space-x-2">
                             <i class="fas fa-school text-accent-purple text-lg"></i>
                             <span>GCE ADVANCED LEVEL - Engineering Technology Stream</span>
@@ -334,7 +326,7 @@
             </div>
         </section>
         
-        <!-- 4.5. NEW: Licenses & Certificates Section -->
+        <!-- 4.5. Licenses & Certificates Section -->
         <section id="licenses-certs" class="py-12 border-t border-secondary-dark">
             <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
                 <i class="fas fa-award mr-3"></i> Licenses & Certificates
@@ -354,7 +346,6 @@
                 </a>
             </div>
         </section>
-        <!-- END Licenses & Certificates Section -->
 
         <!-- 5. Projects Section -->
         <section id="projects" class="py-12 border-t border-secondary-dark">
@@ -371,7 +362,6 @@
             <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
                 <i class="fas fa-headset mr-3"></i> Get In Touch
             </h2>
-            <!-- Adjusted grid columns to 5 (from 6) after removing the Certifications link -->
             <div class="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 text-center"> 
                 <!-- Contact Items will be dynamically populated by JavaScript -->
             </div>
@@ -395,12 +385,10 @@
         const portfolioData = {
             profile: {
                 name: "Vidusha Chathuranga",
-                // Corrected WhatsApp number to 94786217491
                 whatsappNumber: "94786217491", 
                 birthDate: "03/13/2004", // MM/DD/YYYY format for reliable calculation
                 city: "Kandy" 
             },
-            // NEW: Array for the animated role display
             roles: [
                 "Full Stack Aspirant",
                 "Versatile WordPress Developer",
@@ -438,7 +426,7 @@
                     description: "A functional WordPress E-Commerce website focused on selling small goods. Developed with a focus on user experience and conversion optimization.",
                     techStack: "WordPress, WooCommerce, SEO tools, Plugins",
                     liveDemo: "https://livingminiatures.wuaze.com/", 
-                    github: "", // GitHub link removed
+                    github: "", 
                     icon: "fas fa-shopping-cart"
                 },
                 {
@@ -446,7 +434,7 @@
                     description: "A custom-designed WooCommerce store focused on specialized products (e.g., crafts/yarn). Implemented secure payment gateways and inventory tracking for a seamless e-commerce experience.",
                     techStack: "WordPress, WooCommerce, Payment Gateways, Inventory Management",
                     liveDemo: "https://magicyarn.lovestoblog.com/", 
-                    github: "", // GitHub link removed
+                    github: "", 
                     icon: "fas fa-store" 
                 },
                 {
@@ -454,7 +442,7 @@
                     description: "An educational WordPress website designed for online learning. Integrated Learning Management System (LMS) plugins to provide a structured e-learning environment.",
                     techStack: "WordPress, LMS Plugins (LearnDash/Tutor LMS)",
                     liveDemo: "http://studynest.byethost14.com",
-                    github: "", // GitHub link removed
+                    github: "", 
                     icon: "fas fa-graduation-cap"
                 }
             ],
@@ -464,7 +452,7 @@
                     title: "Resume",
                     details: "Download CV",
                     iconClass: "fas fa-file-download",
-                    link: "https://drive.google.com/uc?id=1KFN-VKsfoY1QyN7Ka1DR2vfn4gbL7xzK", // Direct download link from user's provided ID
+                    link: "https://drive.google.com/uc?id=1KFN-VKsfoY1QyN7Ka1DR2vfn4gbL7xzK", // Direct download link
                     animationDelay: "delay-[100ms]",
                     color: "bg-accent-purple hover:bg-violet-600"
                 },
@@ -472,8 +460,7 @@
                     title: "WhatsApp",
                     details: "Message Me", 
                     iconClass: "fab fa-whatsapp",
-                    // Using the new WhatsApp number 94786217491
-                    link: `https://wa.me/${portfolioData.profile.whatsappNumber}`, 
+                    link: `https://wa.me/94786217491`, 
                     animationDelay: "delay-[200ms]",
                     color: "bg-green-600 hover:bg-green-700"
                 },
@@ -518,69 +505,69 @@
         
         /**
          * Calculates the current age based on a birthdate string (MM/DD/YYYY).
-         * @param {string} birthDateString - The date of birth in MM/DD/YYYY format.
-         * @returns {string} The calculated age followed by ' years old'.
          */
         function calculateAge(birthDateString) {
-            const today = new Date();
-            const parts = birthDateString.split('/');
-            // Date constructor: new Date(year, monthIndex, day)
-            const birthDate = new Date(parts[2], parts[0] - 1, parts[1]);
-            
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const m = today.getMonth() - birthDate.getMonth();
-            
-            // Adjust age if birthday hasn't passed this year yet
-            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
+            try {
+                const today = new Date();
+                const parts = birthDateString.split('/');
+                const birthDate = new Date(parts[2], parts[0] - 1, parts[1]);
+                
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                return `${age} years old`;
+            } catch (error) {
+                console.error("Error calculating age:", error);
+                return "Age calculation error";
             }
-            return `${age} years old`;
         }
 
         /**
          * Implements the typewriter animation for roles.
-         * @param {string[]} roles - Array of strings to cycle through.
          */
         function startRoleAnimation(roles) {
             const textElement = document.getElementById('role-text');
+            if (!textElement) {
+                console.warn("Role text element not found.");
+                return;
+            }
             let roleIndex = 0;
             let charIndex = 0;
             let isDeleting = false;
             let speed = 150; 
 
             function type() {
-                const currentRole = roles[roleIndex];
-                
-                if (isDeleting) {
-                    // Deleting state (faster speed)
-                    charIndex--;
-                    speed = 75; 
-                    textElement.textContent = currentRole.substring(0, charIndex);
-                } else {
-                    // Typing state (normal speed)
-                    charIndex++;
-                    speed = 150; 
-                    textElement.textContent = currentRole.substring(0, charIndex);
-                }
+                try {
+                    const currentRole = roles[roleIndex];
+                    
+                    if (isDeleting) {
+                        charIndex--;
+                        speed = 75; 
+                        textElement.textContent = currentRole.substring(0, charIndex);
+                    } else {
+                        charIndex++;
+                        speed = 150; 
+                        textElement.textContent = currentRole.substring(0, charIndex);
+                    }
 
-                // State transitions
-                if (!isDeleting && charIndex === currentRole.length) {
-                    // Finished typing: Pause, then start deleting
-                    isDeleting = true;
-                    speed = 1500; // Pause duration
-                } else if (isDeleting && charIndex === 0) {
-                    // Finished deleting: Move to the next role
-                    isDeleting = false;
-                    roleIndex = (roleIndex + 1) % roles.length;
-                    speed = 500; // Short pause before starting next word
-                }
+                    if (!isDeleting && charIndex === currentRole.length) {
+                        isDeleting = true;
+                        speed = 1500; 
+                    } else if (isDeleting && charIndex === 0) {
+                        isDeleting = false;
+                        roleIndex = (roleIndex + 1) % roles.length;
+                        speed = 500; 
+                    }
 
-                // Re-schedule the function call
-                setTimeout(type, speed);
+                    setTimeout(type, speed);
+                } catch (error) {
+                    console.error("Role animation failed:", error);
+                }
             }
-
-            // Start the animation loop
-            setTimeout(type, 500); // Initial delay before starting
+            setTimeout(type, 500); 
         }
 
         // =================================================================
@@ -592,112 +579,118 @@
         // --- Render Skills ---
         function renderSkills() {
             const container = document.getElementById('skills-container');
-            container.innerHTML = portfolioData.skills.map((skill, index) => `
-                <!-- The container below uses:
-                     - hover:bg-accent-purple to change the card's background color.
-                     - hover:border-accent-purple to change the card's border color.
-                     - group class to enable group-hover state changes for nested elements.
-                -->
-                <div class="bg-secondary-dark p-6 rounded-xl shadow-lg flex flex-col items-center space-y-3 transform hover:scale-105 transition duration-300 border border-secondary-dark hover:border-accent-purple hover:bg-accent-purple fade-in-scroll group" style="transition-delay: ${index * 70}ms;">
-                    <!-- Icon color changes to white on hover using group-hover:text-white -->
-                    <i class="${skill.iconClass} ${skill.color} text-4xl transition duration-300 group-hover:text-white"></i>
-                    <!-- Text color changes to white on hover using group-hover:text-white -->
-                    <p class="text-text-light font-medium text-center transition duration-300 group-hover:text-white">${skill.name}</p>
-                </div>
-            `).join('');
+            if (!container) return console.error("Skills container not found.");
+            
+            try {
+                container.innerHTML = portfolioData.skills.map((skill, index) => `
+                    <div class="bg-secondary-dark p-6 rounded-xl shadow-lg flex flex-col items-center space-y-3 transform hover:scale-105 transition duration-300 border border-secondary-dark hover:border-accent-purple hover:bg-accent-purple fade-in-scroll group" style="transition-delay: ${index * 70}ms;">
+                        <i class="${skill.iconClass} ${skill.color} text-4xl transition duration-300 group-hover:text-white"></i>
+                        <p class="text-text-light font-medium text-center transition duration-300 group-hover:text-white">${skill.name}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error("Error rendering skills:", error);
+            }
         }
         
         // --- Render Languages ---
         function renderLanguages() {
             const container = document.getElementById('languages-container');
-            container.innerHTML = portfolioData.languages.map((lang, index) => `
-                <div class="fade-in-scroll" style="transition-delay: ${index * 100}ms;">
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-text-light font-medium">${lang.name}</span>
-                        <span class="text-accent-purple text-sm font-semibold">${lang.proficiency}</span>
+            if (!container) return console.error("Languages container not found.");
+            
+            try {
+                container.innerHTML = portfolioData.languages.map((lang, index) => `
+                    <div class="fade-in-scroll" style="transition-delay: ${index * 100}ms;">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-text-light font-medium">${lang.name}</span>
+                            <span class="text-accent-purple text-sm font-semibold">${lang.proficiency}</span>
+                        </div>
+                        <div class="w-full bg-primary-dark rounded-full h-2.5">
+                            <div 
+                                class="bg-accent-purple h-2.5 rounded-full transition-all duration-1000 ease-out" 
+                                style="width: ${lang.level}%"
+                            ></div>
+                        </div>
                     </div>
-                    <!-- Proficiency Bar -->
-                    <div class="w-full bg-primary-dark rounded-full h-2.5">
-                        <div 
-                            class="bg-accent-purple h-2.5 rounded-full transition-all duration-1000 ease-out" 
-                            style="width: ${lang.level}%"
-                        ></div>
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            } catch (error) {
+                console.error("Error rendering languages:", error);
+            }
         }
 
         // --- Render Projects ---
         function renderProjects() {
             const container = document.getElementById('projects-container');
-            container.innerHTML = portfolioData.projects.map((project, index) => {
-                // Determine button text based on the nature of the project link
-                const isCodeRepo = project.liveDemo.includes('github') || project.liveDemo === '#';
-                const primaryButtonText = isCodeRepo ? 'View Source Code' : 'Live Demo';
-                
-                // Logic to conditionally render the GitHub button
-                const hasGithub = project.github && project.github !== '';
-                
-                // If there's no GitHub link, the primary button takes full width.
-                const liveDemoClass = hasGithub ? 'flex-1' : 'w-full';
+            if (!container) return console.error("Projects container not found.");
 
-                // Generate the GitHub button HTML conditionally
-                const githubButtonHtml = hasGithub ? `
-                    <a href="${project.github}" target="_blank" class="flex-1 text-center py-2 border border-text-muted text-text-muted rounded-lg hover:bg-text-muted hover:text-primary-dark transition duration-300">
-                        <i class="fab fa-github mr-2"></i> GitHub Repository
-                    </a>
-                ` : '';
+            try {
+                container.innerHTML = portfolioData.projects.map((project, index) => {
+                    const isCodeRepo = project.liveDemo.includes('github') || project.liveDemo === '#';
+                    const primaryButtonText = isCodeRepo ? 'View Source Code' : 'Live Demo';
+                    
+                    const hasGithub = project.github && project.github !== '';
+                    const liveDemoClass = hasGithub ? 'flex-1' : 'w-full';
 
-                return `
-                <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl space-y-4 border border-secondary-dark transform transition duration-500 hover:scale-[1.02] hover:shadow-accent-purple/30 fade-in-scroll" style="transition-delay: ${index * 100}ms;">
-                    <div class="flex items-center space-x-4">
-                        <i class="${project.icon} text-3xl text-accent-purple"></i>
-                        <h3 class="text-2xl font-bold text-text-light">${project.name}</h3>
-                    </div>
-                    <p class="text-text-muted">${project.description}</p>
-                    <div class="flex flex-wrap gap-2 text-sm">
-                        ${project.techStack.split(', ').map(tech => `<span class="px-3 py-1 bg-primary-dark text-accent-blue rounded-full">${tech}</span>`).join('')}
-                    </div>
-                    <div class="flex space-x-4 mt-4">
-                        <a href="${project.liveDemo}" target="_blank" class="${liveDemoClass} text-center py-2 border border-accent-blue text-accent-blue rounded-lg hover:bg-accent-blue hover:text-white transition duration-300">
-                            <i class="fas ${isCodeRepo ? 'fas fa-code' : 'fas fa-external-link-alt'} mr-2"></i> ${primaryButtonText}
+                    const githubButtonHtml = hasGithub ? `
+                        <a href="${project.github}" target="_blank" class="flex-1 text-center py-2 border border-text-muted text-text-muted rounded-lg hover:bg-text-muted hover:text-primary-dark transition duration-300">
+                            <i class="fab fa-github mr-2"></i> GitHub Repository
                         </a>
-                        ${githubButtonHtml}
+                    ` : '';
+
+                    return `
+                    <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl space-y-4 border border-secondary-dark transform transition duration-500 hover:scale-[1.02] hover:shadow-accent-purple/30 fade-in-scroll" style="transition-delay: ${index * 100}ms;">
+                        <div class="flex items-center space-x-4">
+                            <i class="${project.icon} text-3xl text-accent-purple"></i>
+                            <h3 class="text-2xl font-bold text-text-light">${project.name}</h3>
+                        </div>
+                        <p class="text-text-muted">${project.description}</p>
+                        <div class="flex flex-wrap gap-2 text-sm">
+                            ${project.techStack.split(', ').map(tech => `<span class="px-3 py-1 bg-primary-dark text-accent-blue rounded-full">${tech}</span>`).join('')}
+                        </div>
+                        <div class="flex space-x-4 mt-4">
+                            <a href="${project.liveDemo}" target="_blank" class="${liveDemoClass} text-center py-2 border border-accent-blue text-accent-blue rounded-lg hover:bg-accent-blue hover:text-white transition duration-300">
+                                <i class="fas ${isCodeRepo ? 'fas fa-code' : 'fas fa-external-link-alt'} mr-2"></i> ${primaryButtonText}
+                            </a>
+                            ${githubButtonHtml}
+                        </div>
                     </div>
-                </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error("Error rendering projects:", error);
+            }
         }
 
         // --- Render Contact ---
         function renderContact() {
             const grid = document.querySelector('#contact > div.grid');
+            if (!grid) return console.error("Contact grid not found.");
 
-            // NOTE: Grid columns changed to lg:grid-cols-5 after removing the Certifications card.
-            grid.innerHTML = portfolioData.contact.map((item, index) => {
-                // Determine if we need to add a 'download' attribute for the resume link
-                const isResumeLink = item.title === 'Resume';
-                // For the new /uc?id= link, we use the `download` attribute to suggest a file name.
-                const downloadAttribute = isResumeLink ? 'download="Vidusha_Chathuranga_Resume.pdf"' : ''; 
+            try {
+                grid.innerHTML = portfolioData.contact.map((item, index) => {
+                    const isResumeLink = item.title === 'Resume';
+                    const downloadAttribute = isResumeLink ? 'download="Vidusha_Chathuranga_Resume.pdf"' : ''; 
 
-                return `
-                <a href="${item.link}" target="_blank" ${downloadAttribute} class="p-6 rounded-xl shadow-xl space-y-3 transform transition duration-500 hover:scale-110 hover:shadow-lg ${item.color} text-white fade-in-scroll" style="transition-delay: ${index * 150}ms;">
-                    <i class="${item.iconClass} text-5xl transform hover:rotate-6 transition duration-300"></i>
-                    <h4 class="text-xl font-bold">${item.title}</h4>
-                    <p class="text-sm font-light opacity-90">${item.details}</p>
-                </a>
-                `;
-            }).join('');
+                    return `
+                    <a href="${item.link}" target="_blank" ${downloadAttribute} class="p-6 rounded-xl shadow-xl space-y-3 transform transition duration-500 hover:scale-110 hover:shadow-lg ${item.color} text-white fade-in-scroll" style="transition-delay: ${index * 150}ms;">
+                        <i class="${item.iconClass} text-5xl transform hover:rotate-6 transition duration-300"></i>
+                        <h4 class="text-xl font-bold">${item.title}</h4>
+                        <p class="text-sm font-light opacity-90">${item.details}</p>
+                    </a>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error("Error rendering contact section:", error);
+            }
         }
 
         // =================================================================
         // 4. Animation and Interaction Logic (Fade on Scroll)
         // =================================================================
         
-        // Options for the Intersection Observer
         const appearOptions = {
             threshold: 0,
-            rootMargin: "0px 0px -100px 0px" // Start 100px before reaching the element
+            rootMargin: "0px 0px -100px 0px"
         };
 
         const appearOnScroll = new IntersectionObserver(function(entries, observer) {
@@ -715,18 +708,25 @@
         // 5. Welcome Modal Logic
         // =================================================================
         const welcomeModal = document.getElementById('welcome-modal');
+        let modalDismissed = false; // Flag to ensure timer doesn't interfere after manual close
 
         /** Shows the welcome modal with an animation */
         function showWelcomeModal() {
+            if (modalDismissed) return;
             welcomeModal.classList.remove('hidden', 'modal-exit-active');
             welcomeModal.classList.add('modal-enter-active');
             
             // Set a timer to automatically dismiss the modal after 4 seconds
-            setTimeout(hideWelcomeModal, 4000); 
+            setTimeout(() => {
+                if (!modalDismissed) {
+                    hideWelcomeModal();
+                }
+            }, 4000); 
         }
 
         /** Hides the welcome modal with an animation */
         function hideWelcomeModal() {
+            modalDismissed = true; // Set flag when hidden
             welcomeModal.classList.remove('modal-enter-active');
             welcomeModal.classList.add('modal-exit-active');
             
@@ -735,6 +735,9 @@
                 welcomeModal.classList.add('hidden');
             }, 500); 
         }
+
+        // Make the function available globally for the button's onclick
+        window.hideWelcomeModal = hideWelcomeModal;
 
         // =================================================================
         // 6. Tone.js Ambient Music Generator
@@ -745,47 +748,44 @@
         const musicIcon = document.getElementById('musicIcon');
 
         function startAmbientSound() {
-            // Tone.js requires a context start, triggered by user interaction
-            Tone.start();
+            try {
+                Tone.start();
 
-            if (!synth) {
-                // Create a soft, ambient Pad/Drone sound using FMSynth for a more professional tone
-                synth = new Tone.FMSynth({
-                    volume: -24, // Very low volume (low sound)
-                    harmonicity: 0.8,
-                    modulationIndex: 10,
-                    oscillator: { type: "sine" },
-                    envelope: {
-                        attack: 8,      // Very slow attack for a smooth start
-                        decay: 0.5,
-                        sustain: 0.8,
-                        release: 10     // Very slow release for a smooth decay
-                    },
-                    modulation: { type: "square" },
-                    modulationEnvelope: { attack: 1, decay: 0, sustain: 1, release: 0.5 }
-                }).toDestination();
-                
-                // Create a repeating loop of a calming G minor chord (G3, Bb3, D4)
-                const loop = new Tone.Loop(time => {
-                    // Plays G minor slowly every eight seconds (8n is slow with bpm 30)
-                    synth.triggerAttackRelease(["G3", "Bb3", "D4"], "8n", time);
-                }, "8n").start(0); // Start immediately on loop creation
+                if (!synth) {
+                    synth = new Tone.FMSynth({
+                        volume: -24, 
+                        harmonicity: 0.8,
+                        modulationIndex: 10,
+                        oscillator: { type: "sine" },
+                        envelope: {
+                            attack: 8,
+                            decay: 0.5,
+                            sustain: 0.8,
+                            release: 10
+                        },
+                        modulation: { type: "square" },
+                        modulationEnvelope: { attack: 1, decay: 0, sustain: 1, release: 0.5 }
+                    }).toDestination();
+                    
+                    const loop = new Tone.Loop(time => {
+                        synth.triggerAttackRelease(["G3", "Bb3", "D4"], "8n", time);
+                    }, "8n").start(0); 
 
-                // Set a very slow tempo for a calm feel
-                Tone.Transport.bpm.value = 30; 
-                Tone.Transport.start();
+                    Tone.Transport.bpm.value = 30; 
+                    Tone.Transport.start();
+                }
+
+                synth.volume.value = -24; 
+                isPlaying = true;
+                musicIcon.classList.remove('fa-volume-mute');
+                musicIcon.classList.add('fa-volume-up');
+            } catch (error) {
+                console.error("Tone.js failed to start:", error);
             }
-
-            // Ensure volume is correctly set to low and state is updated
-            synth.volume.value = -24; 
-            isPlaying = true;
-            musicIcon.classList.remove('fa-volume-mute');
-            musicIcon.classList.add('fa-volume-up');
         }
 
         function stopAmbientSound() {
             if (synth) {
-                // Set volume to -100 to effectively mute the sound softly
                 synth.volume.value = -100; 
                 isPlaying = false;
                 musicIcon.classList.remove('fa-volume-up');
@@ -793,23 +793,22 @@
             }
         }
 
-        musicToggle.addEventListener('click', () => {
-            if (isPlaying) {
-                stopAmbientSound();
-            } else {
-                startAmbientSound();
-            }
-        });
+        if (musicToggle) {
+            musicToggle.addEventListener('click', () => {
+                if (isPlaying) {
+                    stopAmbientSound();
+                } else {
+                    startAmbientSound();
+                }
+            });
+        }
 
-        // Initialize icon as muted before user interaction
-        musicIcon.classList.remove('fa-volume-up');
-        musicIcon.classList.add('fa-volume-mute');
 
         // =================================================================
         // 7. Initialisation
         // =================================================================
 
-        window.onload = function() {
+        function initializePortfolio() {
             // 1. Render all dynamic content
             renderSkills();
             renderLanguages(); 
@@ -820,27 +819,46 @@
             startRoleAnimation(portfolioData.roles);
 
             // 3. Set the static birthday and calculated age
-            document.getElementById('birth-date').textContent = portfolioData.profile.birthDate;
-            document.getElementById('auto-age').textContent = calculateAge(portfolioData.profile.birthDate);
+            const birthDateEl = document.getElementById('birth-date');
+            const autoAgeEl = document.getElementById('auto-age');
+
+            if (birthDateEl) {
+                birthDateEl.textContent = portfolioData.profile.birthDate;
+            }
+            if (autoAgeEl) {
+                autoAgeEl.textContent = calculateAge(portfolioData.profile.birthDate);
+            }
 
             // 4. Show the Welcome Modal
             showWelcomeModal();
 
-            // 5. Query for all elements that need the fade-in-scroll animation
+            // 5. Apply the fade-in-scroll animation observer
             const faders = document.querySelectorAll('.fade-in-scroll');
             faders.forEach(fader => {
                 appearOnScroll.observe(fader);
             });
-
+        }
+        
+        window.onload = function() {
+            try {
+                initializePortfolio();
+            } catch (error) {
+                // If anything critical fails during initialization, log it and alert the user (non-intrusively).
+                console.error("An error occurred during portfolio initialization:", error);
+                document.body.insertAdjacentHTML('afterbegin', '<div style="position:fixed;top:0;left:0;width:100%;background:#ef4444;color:white;padding:10px;z-index:9999;text-align:center;">Content loading error. Please check the browser console for details.</div>');
+            }
         };
 
         // Smooth Scrolling for internal links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
             });
         });
     </script>
