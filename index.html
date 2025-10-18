@@ -200,7 +200,7 @@
                             <div id="profile-picture-container" class="w-48 h-48 rounded-full border-4 border-accent-purple shadow-2xl flex items-center justify-center bg-primary-dark transition duration-500 hover:scale-105 overflow-hidden">
                                 <img 
                                     id="profile-image"
-                                    src="uploaded:image_1b7f31.jpg-092d766d-c77b-46b7-b9ad-4b0cdd6963ec" 
+                                    src="https://avatars.githubusercontent.com/u/114267552?s=400&u=60b0ab3bf4af6af5ee0cfc69fb03a1156d507b41&v=4" 
                                     alt="Vidusha Chathuranga Profile Picture" 
                                     class="w-full h-full object-cover"
                                     onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='block';"
@@ -485,7 +485,6 @@
                     color: "bg-blue-600 hover:bg-blue-700"
                 },
                 {
-                    // >>> UPDATED GITHUB LINK HERE <<<
                     title: "GitHub",
                     details: "Code Profile",
                     iconClass: "fab fa-github",
@@ -510,69 +509,69 @@
         
         /**
          * Calculates the current age based on a birthdate string (MM/DD/YYYY).
+         * @param {string} birthDateString - The date of birth in MM/DD/YYYY format.
+         * @returns {string} The calculated age followed by ' years old'.
          */
         function calculateAge(birthDateString) {
-            try {
-                const today = new Date();
-                const parts = birthDateString.split('/');
-                const birthDate = new Date(parts[2], parts[0] - 1, parts[1]);
-                
-                let age = today.getFullYear() - birthDate.getFullYear();
-                const m = today.getMonth() - birthDate.getMonth();
-                
-                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                    age--;
-                }
-                return `${age} years old`;
-            } catch (error) {
-                console.error("Error calculating age:", error);
-                return "Age calculation error";
+            const today = new Date();
+            const parts = birthDateString.split('/');
+            // Date constructor: new Date(year, monthIndex, day)
+            const birthDate = new Date(parts[2], parts[0] - 1, parts[1]);
+            
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            
+            // Adjust age if birthday hasn't passed this year yet
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
             }
+            return `${age} years old`;
         }
 
         /**
          * Implements the typewriter animation for roles.
+         * @param {string[]} roles - Array of strings to cycle through.
          */
         function startRoleAnimation(roles) {
             const textElement = document.getElementById('role-text');
-            if (!textElement) {
-                console.warn("Role text element not found.");
-                return;
-            }
             let roleIndex = 0;
             let charIndex = 0;
             let isDeleting = false;
             let speed = 150; 
 
             function type() {
-                try {
-                    const currentRole = roles[roleIndex];
-                    
-                    if (isDeleting) {
-                        charIndex--;
-                        speed = 75; 
-                        textElement.textContent = currentRole.substring(0, charIndex);
-                    } else {
-                        charIndex++;
-                        speed = 150; 
-                        textElement.textContent = currentRole.substring(0, charIndex);
-                    }
-
-                    if (!isDeleting && charIndex === currentRole.length) {
-                        isDeleting = true;
-                        speed = 1500; 
-                    } else if (isDeleting && charIndex === 0) {
-                        isDeleting = false;
-                        roleIndex = (roleIndex + 1) % roles.length;
-                        speed = 500; 
-                    }
-
-                    setTimeout(type, speed);
-                } catch (error) {
-                    console.error("Role animation failed:", error);
+                const currentRole = roles[roleIndex];
+                
+                if (isDeleting) {
+                    // Deleting state (faster speed)
+                    charIndex--;
+                    speed = 75; 
+                    textElement.textContent = currentRole.substring(0, charIndex);
+                } else {
+                    // Typing state (normal speed)
+                    charIndex++;
+                    speed = 150; 
+                    textElement.textContent = currentRole.substring(0, charIndex);
                 }
+
+                // State transitions
+                if (!isDeleting && charIndex === currentRole.length) {
+                    // Finished typing: Pause, then start deleting
+                    isDeleting = true;
+                    speed = 1500; // Pause duration
+                } else if (isDeleting && charIndex === 0) {
+                    // Finished deleting: Move to the next role
+                    isDeleting = false;
+                    roleIndex = (roleIndex + 1) % roles.length;
+                    speed = 500; // Short pause before starting next word
+                }
+
+                // Re-schedule the function call
+                setTimeout(type, speed);
             }
-            setTimeout(type, 500); 
+
+            // Start the animation loop
+            setTimeout(type, 500); // Initial delay before starting
         }
 
         // =================================================================
@@ -584,120 +583,112 @@
         // --- Render Skills ---
         function renderSkills() {
             const container = document.getElementById('skills-container');
-            if (!container) return console.error("Skills container not found.");
-            
-            try {
-                container.innerHTML = portfolioData.skills.map((skill, index) => `
-                    <div class="bg-secondary-dark p-6 rounded-xl shadow-lg flex flex-col items-center space-y-3 transform hover:scale-105 transition duration-300 border border-secondary-dark hover:border-accent-purple hover:bg-accent-purple fade-in-scroll group" style="transition-delay: ${index * 70}ms;">
-                        <i class="${skill.iconClass} ${skill.color} text-4xl transition duration-300 group-hover:text-white"></i>
-                        <p class="text-text-light font-medium text-center transition duration-300 group-hover:text-white">${skill.name}</p>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error("Error rendering skills:", error);
-            }
+            container.innerHTML = portfolioData.skills.map((skill, index) => `
+                <!-- The container below uses:
+                     - hover:bg-accent-purple to change the card's background color.
+                     - hover:border-accent-purple to change the card's border color.
+                     - group class to enable group-hover state changes for nested elements.
+                -->
+                <div class="bg-secondary-dark p-6 rounded-xl shadow-lg flex flex-col items-center space-y-3 transform hover:scale-105 transition duration-300 border border-secondary-dark hover:border-accent-purple hover:bg-accent-purple fade-in-scroll group" style="transition-delay: ${index * 70}ms;">
+                    <!-- Icon color changes to white on hover using group-hover:text-white -->
+                    <i class="${skill.iconClass} ${skill.color} text-4xl transition duration-300 group-hover:text-white"></i>
+                    <!-- Text color changes to white on hover using group-hover:text-white -->
+                    <p class="text-text-light font-medium text-center transition duration-300 group-hover:text-white">${skill.name}</p>
+                </div>
+            `).join('');
         }
         
         // --- Render Languages ---
         function renderLanguages() {
             const container = document.getElementById('languages-container');
-            if (!container) return console.error("Languages container not found.");
-            
-            try {
-                container.innerHTML = portfolioData.languages.map((lang, index) => `
-                    <div class="fade-in-scroll" style="transition-delay: ${index * 100}ms;">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-text-light font-medium">${lang.name}</span>
-                            <span class="text-accent-purple text-sm font-semibold">${lang.proficiency}</span>
-                        </div>
-                        <div class="w-full bg-primary-dark rounded-full h-2.5">
-                            <div 
-                                class="bg-accent-purple h-2.5 rounded-full transition-all duration-1000 ease-out" 
-                                style="width: ${lang.level}%"
-                            ></div>
-                        </div>
+            container.innerHTML = portfolioData.languages.map((lang, index) => `
+                <div class="fade-in-scroll" style="transition-delay: ${index * 100}ms;">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-text-light font-medium">${lang.name}</span>
+                        <span class="text-accent-purple text-sm font-semibold">${lang.proficiency}</span>
                     </div>
-                `).join('');
-            } catch (error) {
-                console.error("Error rendering languages:", error);
-            }
+                    <!-- Proficiency Bar -->
+                    <div class="w-full bg-primary-dark rounded-full h-2.5">
+                        <div 
+                            class="bg-accent-purple h-2.5 rounded-full transition-all duration-1000 ease-out" 
+                            style="width: ${lang.level}%"
+                        ></div>
+                    </div>
+                </div>
+            `).join('');
         }
 
         // --- Render Projects ---
         function renderProjects() {
             const container = document.getElementById('projects-container');
-            if (!container) return console.error("Projects container not found.");
+            container.innerHTML = portfolioData.projects.map((project, index) => {
+                // Determine button text based on the nature of the project link
+                const isCodeRepo = project.liveDemo.includes('github') || project.liveDemo === '#';
+                const primaryButtonText = isCodeRepo ? 'View Source Code' : 'Live Demo';
+                
+                // Logic to conditionally render the GitHub button
+                const hasGithub = project.github && project.github !== '';
+                
+                // If there's no GitHub link, the primary button takes full width.
+                const liveDemoClass = hasGithub ? 'flex-1' : 'w-full';
 
-            try {
-                container.innerHTML = portfolioData.projects.map((project, index) => {
-                    const isCodeRepo = project.liveDemo.includes('github') || project.liveDemo === '#';
-                    const primaryButtonText = isCodeRepo ? 'View Source Code' : 'Live Demo';
-                    
-                    const hasGithub = project.github && project.github !== '';
-                    const liveDemoClass = hasGithub ? 'flex-1' : 'w-full';
+                // Generate the GitHub button HTML conditionally
+                const githubButtonHtml = hasGithub ? `
+                    <a href="${project.github}" target="_blank" class="flex-1 text-center py-2 border border-text-muted text-text-muted rounded-lg hover:bg-text-muted hover:text-primary-dark transition duration-300">
+                        <i class="fab fa-github mr-2"></i> GitHub Repository
+                    </a>
+                ` : '';
 
-                    const githubButtonHtml = hasGithub ? `
-                        <a href="${project.github}" target="_blank" class="flex-1 text-center py-2 border border-text-muted text-text-muted rounded-lg hover:bg-text-muted hover:text-primary-dark transition duration-300">
-                            <i class="fab fa-github mr-2"></i> GitHub Repository
-                        </a>
-                    ` : '';
-
-                    return `
-                    <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl space-y-4 border border-secondary-dark transform transition duration-500 hover:scale-[1.02] hover:shadow-accent-purple/30 fade-in-scroll" style="transition-delay: ${index * 100}ms;">
-                        <div class="flex items-center space-x-4">
-                            <i class="${project.icon} text-3xl text-accent-purple"></i>
-                            <h3 class="text-2xl font-bold text-text-light">${project.name}</h3>
-                        </div>
-                        <p class="text-text-muted">${project.description}</p>
-                        <div class="flex flex-wrap gap-2 text-sm">
-                            ${project.techStack.split(', ').map(tech => `<span class="px-3 py-1 bg-primary-dark text-accent-blue rounded-full">${tech}</span>`).join('')}
-                        </div>
-                        <div class="flex space-x-4 mt-4">
-                            <!-- External link: Added target="_blank" -->
-                            <a href="${project.liveDemo}" target="_blank" class="${liveDemoClass} text-center py-2 border border-accent-blue text-accent-blue rounded-lg hover:bg-accent-blue hover:text-white transition duration-300">
-                                <i class="fas ${isCodeRepo ? 'fas fa-code' : 'fas fa-external-link-alt'} mr-2"></i> ${primaryButtonText}
-                            </a>
-                            ${githubButtonHtml}
-                        </div>
+                return `
+                <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl space-y-4 border border-secondary-dark transform transition duration-500 hover:scale-[1.02] hover:shadow-accent-purple/30 fade-in-scroll" style="transition-delay: ${index * 100}ms;">
+                    <div class="flex items-center space-x-4">
+                        <i class="${project.icon} text-3xl text-accent-purple"></i>
+                        <h3 class="text-2xl font-bold text-text-light">${project.name}</h3>
                     </div>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error("Error rendering projects:", error);
-            }
+                    <p class="text-text-muted">${project.description}</p>
+                    <div class="flex flex-wrap gap-2 text-sm">
+                        ${project.techStack.split(', ').map(tech => `<span class="px-3 py-1 bg-primary-dark text-accent-blue rounded-full">${tech}</span>`).join('')}
+                    </div>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="${project.liveDemo}" target="_blank" class="${liveDemoClass} text-center py-2 border border-accent-blue text-accent-blue rounded-lg hover:bg-accent-blue hover:text-white transition duration-300">
+                            <i class="fas ${isCodeRepo ? 'fas fa-code' : 'fas fa-external-link-alt'} mr-2"></i> ${primaryButtonText}
+                        </a>
+                        ${githubButtonHtml}
+                    </div>
+                </div>
+                `;
+            }).join('');
         }
 
         // --- Render Contact ---
         function renderContact() {
             const grid = document.querySelector('#contact > div.grid');
-            if (!grid) return console.error("Contact grid not found.");
 
-            try {
-                grid.innerHTML = portfolioData.contact.map((item, index) => {
-                    const isResumeLink = item.title === 'Resume';
-                    const downloadAttribute = isResumeLink ? 'download="Vidusha_Chathuranga_Resume.pdf"' : ''; 
-                    
-                    // Added target="_blank" to all dynamically generated contact links
-                    return `
-                    <a href="${item.link}" target="_blank" ${downloadAttribute} class="p-6 rounded-xl shadow-xl space-y-3 transform transition duration-500 hover:scale-110 hover:shadow-lg ${item.color} text-white fade-in-scroll" style="transition-delay: ${index * 150}ms;">
-                        <i class="${item.iconClass} text-5xl transform hover:rotate-6 transition duration-300"></i>
-                        <h4 class="text-xl font-bold">${item.title}</h4>
-                        <p class="text-sm font-light opacity-90">${item.details}</p>
-                    </a>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error("Error rendering contact section:", error);
-            }
+            // NOTE: Grid columns changed to lg:grid-cols-5 after removing the Certifications card.
+            grid.innerHTML = portfolioData.contact.map((item, index) => {
+                // Determine if we need to add a 'download' attribute for the resume link
+                const isResumeLink = item.title === 'Resume';
+                // For the new /uc?id= link, we use the `download` attribute to suggest a file name.
+                const downloadAttribute = isResumeLink ? 'download="Vidusha_Chathuranga_Resume.pdf"' : ''; 
+
+                return `
+                <a href="${item.link}" target="_blank" ${downloadAttribute} class="p-6 rounded-xl shadow-xl space-y-3 transform transition duration-500 hover:scale-110 hover:shadow-lg ${item.color} text-white fade-in-scroll" style="transition-delay: ${index * 150}ms;">
+                    <i class="${item.iconClass} text-5xl transform hover:rotate-6 transition duration-300"></i>
+                    <h4 class="text-xl font-bold">${item.title}</h4>
+                    <p class="text-sm font-light opacity-90">${item.details}</p>
+                </a>
+                `;
+            }).join('');
         }
 
         // =================================================================
         // 4. Animation and Interaction Logic (Fade on Scroll)
         // =================================================================
         
+        // Options for the Intersection Observer
         const appearOptions = {
             threshold: 0,
-            rootMargin: "0px 0px -100px 0px"
+            rootMargin: "0px 0px -100px 0px" // Start 100px before reaching the element
         };
 
         const appearOnScroll = new IntersectionObserver(function(entries, observer) {
@@ -715,25 +706,18 @@
         // 5. Welcome Modal Logic
         // =================================================================
         const welcomeModal = document.getElementById('welcome-modal');
-        let modalDismissed = false; // Flag to ensure timer doesn't interfere after manual close
 
         /** Shows the welcome modal with an animation */
         function showWelcomeModal() {
-            if (modalDismissed) return;
             welcomeModal.classList.remove('hidden', 'modal-exit-active');
             welcomeModal.classList.add('modal-enter-active');
             
             // Set a timer to automatically dismiss the modal after 4 seconds
-            setTimeout(() => {
-                if (!modalDismissed) {
-                    hideWelcomeModal();
-                }
-            }, 4000); 
+            setTimeout(hideWelcomeModal, 4000); 
         }
 
         /** Hides the welcome modal with an animation */
         function hideWelcomeModal() {
-            modalDismissed = true; // Set flag when hidden
             welcomeModal.classList.remove('modal-enter-active');
             welcomeModal.classList.add('modal-exit-active');
             
@@ -742,9 +726,6 @@
                 welcomeModal.classList.add('hidden');
             }, 500); 
         }
-
-        // Make the function available globally for the button's onclick
-        window.hideWelcomeModal = hideWelcomeModal;
 
         // =================================================================
         // 6. Tone.js Ambient Music Generator
@@ -755,44 +736,47 @@
         const musicIcon = document.getElementById('musicIcon');
 
         function startAmbientSound() {
-            try {
-                Tone.start();
+            // Tone.js requires a context start, triggered by user interaction
+            Tone.start();
 
-                if (!synth) {
-                    synth = new Tone.FMSynth({
-                        volume: -24, 
-                        harmonicity: 0.8,
-                        modulationIndex: 10,
-                        oscillator: { type: "sine" },
-                        envelope: {
-                            attack: 8,
-                            decay: 0.5,
-                            sustain: 0.8,
-                            release: 10
-                        },
-                        modulation: { type: "square" },
-                        modulationEnvelope: { attack: 1, decay: 0, sustain: 1, release: 0.5 }
-                    }).toDestination();
-                    
-                    const loop = new Tone.Loop(time => {
-                        synth.triggerAttackRelease(["G3", "Bb3", "D4"], "8n", time);
-                    }, "8n").start(0); 
+            if (!synth) {
+                // Create a soft, ambient Pad/Drone sound using FMSynth for a more professional tone
+                synth = new Tone.FMSynth({
+                    volume: -24, // Very low volume (low sound)
+                    harmonicity: 0.8,
+                    modulationIndex: 10,
+                    oscillator: { type: "sine" },
+                    envelope: {
+                        attack: 8,      // Very slow attack for a smooth start
+                        decay: 0.5,
+                        sustain: 0.8,
+                        release: 10     // Very slow release for a smooth decay
+                    },
+                    modulation: { type: "square" },
+                    modulationEnvelope: { attack: 1, decay: 0, sustain: 1, release: 0.5 }
+                }).toDestination();
+                
+                // Create a repeating loop of a calming G minor chord (G3, Bb3, D4)
+                const loop = new Tone.Loop(time => {
+                    // Plays G minor slowly every eight seconds (8n is slow with bpm 30)
+                    synth.triggerAttackRelease(["G3", "Bb3", "D4"], "8n", time);
+                }, "8n").start(0); // Start immediately on loop creation
 
-                    Tone.Transport.bpm.value = 30; 
-                    Tone.Transport.start();
-                }
-
-                synth.volume.value = -24; 
-                isPlaying = true;
-                musicIcon.classList.remove('fa-volume-mute');
-                musicIcon.classList.add('fa-volume-up');
-            } catch (error) {
-                console.error("Tone.js failed to start:", error);
+                // Set a very slow tempo for a calm feel
+                Tone.Transport.bpm.value = 30; 
+                Tone.Transport.start();
             }
+
+            // Ensure volume is correctly set to low and state is updated
+            synth.volume.value = -24; 
+            isPlaying = true;
+            musicIcon.classList.remove('fa-volume-mute');
+            musicIcon.classList.add('fa-volume-up');
         }
 
         function stopAmbientSound() {
             if (synth) {
+                // Set volume to -100 to effectively mute the sound softly
                 synth.volume.value = -100; 
                 isPlaying = false;
                 musicIcon.classList.remove('fa-volume-up');
@@ -800,22 +784,23 @@
             }
         }
 
-        if (musicToggle) {
-            musicToggle.addEventListener('click', () => {
-                if (isPlaying) {
-                    stopAmbientSound();
-                } else {
-                    startAmbientSound();
-                }
-            });
-        }
+        musicToggle.addEventListener('click', () => {
+            if (isPlaying) {
+                stopAmbientSound();
+            } else {
+                startAmbientSound();
+            }
+        });
 
+        // Initialize icon as muted before user interaction
+        musicIcon.classList.remove('fa-volume-up');
+        musicIcon.classList.add('fa-volume-mute');
 
         // =================================================================
         // 7. Initialisation
         // =================================================================
 
-        function initializePortfolio() {
+        window.onload = function() {
             // 1. Render all dynamic content
             renderSkills();
             renderLanguages(); 
@@ -826,46 +811,27 @@
             startRoleAnimation(portfolioData.roles);
 
             // 3. Set the static birthday and calculated age
-            const birthDateEl = document.getElementById('birth-date');
-            const autoAgeEl = document.getElementById('auto-age');
-
-            if (birthDateEl) {
-                birthDateEl.textContent = portfolioData.profile.birthDate;
-            }
-            if (autoAgeEl) {
-                autoAgeEl.textContent = calculateAge(portfolioData.profile.birthDate);
-            }
+            document.getElementById('birth-date').textContent = portfolioData.profile.birthDate;
+            document.getElementById('auto-age').textContent = calculateAge(portfolioData.profile.birthDate);
 
             // 4. Show the Welcome Modal
             showWelcomeModal();
 
-            // 5. Apply the fade-in-scroll animation observer
+            // 5. Query for all elements that need the fade-in-scroll animation
             const faders = document.querySelectorAll('.fade-in-scroll');
             faders.forEach(fader => {
                 appearOnScroll.observe(fader);
             });
-        }
-        
-        window.onload = function() {
-            try {
-                initializePortfolio();
-            } catch (error) {
-                // If anything critical fails during initialization, log it and alert the user (non-intrusively).
-                console.error("An error occurred during portfolio initialization:", error);
-                document.body.insertAdjacentHTML('afterbegin', '<div style="position:fixed;top:0;left:0;width:100%;background:#ef4444;color:white;padding:10px;z-index:9999;text-align:center;">Content loading error. Please check the browser console for details.</div>');
-            }
+
         };
 
-        // Smooth Scrolling for internal links (Crucial: prevents internal links from opening new tabs)
+        // Smooth Scrolling for internal links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
             });
         });
     </script>
