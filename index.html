@@ -111,7 +111,7 @@
     <!-- Welcome Greeting Modal -->
     <div id="welcome-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-primary-dark/80 backdrop-blur-sm modal-enter hidden">
         <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border-2 border-accent-purple transform transition duration-500">
-            <i class="fas fa-hand-wave text-5xl text-accent-blue mb-4 animate-bounce-once"></i>
+            <i class="fas fa-hand-wave text-5xl text-accent-blue mb-4"></i>
             <h3 class="text-3xl font-bold text-accent-purple mb-2 font-display">Welcome!</h3>
             <p class="text-text-light mb-6">
                 I'm glad you stopped by! Feel free to explore my projects and skills.
@@ -142,7 +142,7 @@
                 <a href="#projects" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Projects</a>
                 <a href="gallery.html" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Gallery</a>
                 <a href="#contact" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Contact</a>
-                <!-- NEW: Link to the private page -->
+                <!-- Link to the private page -->
                 <a href="me.html" class="text-text-light hover:text-accent-blue transition duration-300 font-medium flex items-center" title="Private Section">
                     <i class="fas fa-lock mr-2"></i>Me
                 </a>
@@ -161,14 +161,14 @@
                 </h1>
                 
                 <!-- Dynamic Role Display -->
-                <div class="text-xl sm:text-2xl text-text-muted animate-slide-up animation-delay-300 flex justify-center items-center h-8 sm:h-10">
+                <div class="text-xl sm:text-2xl text-text-muted flex justify-center items-center h-8 sm:h-10">
                     <span class="mr-2 hidden sm:inline">I am a</span>
                     <span id="role-text" class="font-bold text-accent-purple inline-block whitespace-nowrap overflow-hidden"></span>
                 </div>
                 <!-- End Dynamic Role Display -->
 
                 <!-- Internal link, no target="_blank" -->
-                <a href="#projects" class="inline-block px-8 py-3 mt-8 text-lg font-semibold text-white bg-accent-purple rounded-full shadow-lg shadow-violet-500/50 hover:bg-violet-600 transition duration-300 transform hover:scale-105 animate-slide-up animation-delay-600">
+                <a href="#projects" class="inline-block px-8 py-3 mt-8 text-lg font-semibold text-white bg-accent-purple rounded-full shadow-lg shadow-violet-500/50 hover:bg-violet-600 transition duration-300 transform hover:scale-105">
                     View My Work <i class="fas fa-arrow-right ml-2"></i>
                 </a>
             </div>
@@ -201,5 +201,569 @@
                     <!-- Profile Photo Card -->
                     <div class="p-6 bg-secondary-dark rounded-xl shadow-xl fade-in-scroll flex justify-center transform transition duration-500 hover:scale-[1.05]">
                         <!-- External link: Added target="_blank" -->
-                        <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a3
+                        <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a334241" target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn Profile">
+                            <div id="profile-picture-container" class="w-48 h-48 rounded-full border-4 border-accent-purple shadow-2xl flex items-center justify-center bg-primary-dark transition duration-500 hover:scale-105 overflow-hidden">
+                                <img 
+                                    id="profile-image"
+                                    src="https://avatars.githubusercontent.com/u/114267552?s=400&u=60b0ab3bf4af6af5ee0cfc69fb03a1156d507b41&v=4" 
+                                    alt="Vidusha Chathuranga Profile Picture" 
+                                    class="w-full h-full object-cover"
+                                    onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='flex';"
+                                >
+                                <!-- Fallback Icon (initially hidden) -->
+                                <div id="fallback-icon" class="hidden w-full h-full items-center justify-center">
+                                    <i class="fas fa-user-tie text-8xl text-accent-purple"></i>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <!-- Bio Details Card -->
+                    <div id="bio-details" class="p-6 bg-secondary-dark rounded-xl shadow-xl fade-in-scroll"></div>
+                    <!-- Language Proficiency Card -->
+                    <div id="language-skills" class="p-6 bg-secondary-dark rounded-xl shadow-xl fade-in-scroll"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Skills Section -->
+        <section id="skills" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-cogs mr-3"></i> Core Skills
+            </h2>
+            <div id="skills-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Skills will be rendered here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- 4. Work & Education Experience -->
+        <section id="experience" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-briefcase mr-3"></i> Work & Education
+            </h2>
+            <div id="experience-container" class="space-y-8 relative">
+                <!-- Vertical timeline line -->
+                <div class="absolute left-4 top-0 h-full w-0.5 bg-secondary-dark"></div>
+                <!-- Experience items will be rendered here -->
+            </div>
+        </section>
+        
+        <!-- NEW: Licenses & Certifications Section -->
+        <section id="licenses-certs" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-award mr-3"></i> Licenses & Certificates
+            </h2>
+            <div class="bg-secondary-dark p-8 rounded-xl shadow-xl text-center max-w-2xl mx-auto fade-in-scroll">
+                 <i class="fas fa-shield-alt text-5xl text-accent-purple mb-4"></i>
+                <h3 class="text-2xl font-semibold text-text-light mb-3">View My Credentials</h3>
+                <p class="text-text-muted mb-6">
+                    For security reasons, LinkedIn does not allow its content to be embedded here. Please click the button below to view my full list of licenses and certifications in a new tab.
+                </p>
+                <!-- External link: Added target="_blank" -->
+                <a href="https://www.linkedin.com/in/vidusha-chathuranga-51a334241/details/certifications/" target="_blank" rel="noopener noreferrer" class="inline-block px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
+                    View on LinkedIn <i class="fas fa-external-link-alt ml-2"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- 5. Featured Projects Section -->
+        <section id="projects" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-project-diagram mr-3"></i> Featured Projects
+            </h2>
+            <div id="projects-container" class="grid md:grid-cols-2 gap-8">
+                <!-- Projects will be rendered here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- 6. Gallery Section -->
+        <section id="gallery" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-images mr-3"></i> Gallery
+            </h2>
+            <div class="text-center text-text-muted fade-in-scroll">
+                <p>This section is currently under construction.</p>
+                <p>Check back soon to see visual showcases of my work!</p>
+            </div>
+        </section>
+
+        <!-- 7. Get In Touch Section -->
+        <section id="contact" class="py-12 border-t border-secondary-dark">
+            <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
+                <i class="fas fa-envelope-open-text mr-3"></i> Get In Touch
+            </h2>
+            <div id="contact-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <!-- Contact items will be rendered here -->
+            </div>
+        </section>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-primary-dark border-t-2 border-secondary-dark py-8 text-center text-text-muted">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p>&copy; <span id="footer-year"></span> Vidusha Chathuranga. All Rights Reserved.</p>
+            <p>Designed with a passion for code and creativity.</p>
+            <p class="mt-2 text-sm">Kandy, Sri Lanka</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- DATA OBJECT ---
+        // Centralized data for easy portfolio updates.
+        const portfolioData = {
+            profile: {
+                name: "Vidusha Chathuranga",
+                // Corrected WhatsApp number
+                whatsappNumber: "94786217491", 
+                birthDate: "03/13/2004", // MM/DD/YYYY format for reliable calculation
+                city: "Kandy" 
+            },
+            skills: [
+                { name: "HTML5", icon: "fab fa-html5", color: "text-orange-500" },
+                { name: "CSS3", icon: "fab fa-css3-alt", color: "text-blue-500" },
+                { name: "JavaScript", icon: "fab fa-js-square", color: "text-yellow-400" },
+                { name: "WordPress", icon: "fab fa-wordpress", color: "text-blue-400" },
+                { name: "PHP", icon: "fab fa-php", color: "text-indigo-400" },
+                { name: "Python", icon: "fab fa-python", color: "text-green-500" },
+                { name: "Java", icon: "fab fa-java", color: "text-red-500" },
+                { name: "C# / .NET", icon: "fas fa-code", color: "text-purple-500" },
+                { name: "SQL", icon: "fas fa-database", color: "text-sky-400" },
+                { name: "Git / GitHub", icon: "fab fa-github", color: "text-gray-300" },
+                { name: "MS Office", icon: "fas fa-file-word", color: "text-blue-600" },
+                { name: "Resume Writing", icon: "fas fa-file-alt", color: "text-teal-400" }
+            ],
+            experience: [
+                {
+                    type: 'Work',
+                    title: "Wordpress Developer (Intern)",
+                    institution: "Allaboutwebservices.com Inc",
+                    period: "August 2025 - Present",
+                    description: "Responsible for website content management, WordPress development and maintenance, and integrating AI tools to enhance functionality.",
+                    icon: "fas fa-briefcase"
+                },
+                {
+                    type: 'Work',
+                    title: "Freelance Resume Writer",
+                    institution: "Self-Employed",
+                    period: "2023 - Present",
+                    description: "Crafted tailored resumes for clients across different industries, highlighting their skills, achievements, and qualifications to help them land interviews.",
+                    icon: "fas fa-pen-nib"
+                },
+                {
+                    type: 'Education',
+                    title: "Higher National Diploma in Information Technology",
+                    institution: "Sri Lanka Institute of Advanced Technological Education",
+                    institutionLink: "https://sliate.ac.lk/",
+                    period: "2024 - Present (Undergraduate)",
+                    description: "Pursuing a comprehensive HND focused on core IT principles, software development, and networking.",
+                    icon: "fas fa-graduation-cap"
+                },
+                {
+                    type: 'Education',
+                    title: "Full Stack Developer Course",
+                    institution: "University of Moratuwa (CODL)",
+                    period: "2024",
+                    description: "Completed an intensive course covering modern full-stack technologies, including front-end frameworks and back-end development.",
+                    icon: "fas fa-desktop"
+                },
+                {
+                    type: 'Education',
+                    title: "GCE Advanced Level - Engineering Technology",
+                    institution: "Jinaraja Boys Collage, Gampola",
+                    period: "Completed 2023",
+                    description: "Successfully completed A-Levels with a focus on engineering principles and technology.",
+                    results: [
+                        { subject: "Information Communication Technology", grade: "C" },
+                        { subject: "Engineering Technology", grade: "S" },
+                        { subject: "Science For Technology", grade: "S" },
+                        { subject: "General English", grade: "S" }
+                    ],
+                    icon: "fas fa-school"
+                }
+            ],
+            projects: [
+                 {
+                    title: "C# POS System",
+                    description: "A comprehensive Point-of-Sale desktop application for retail shops, built to manage inventory, sales, and reporting efficiently.",
+                    techStack: ["C#", ".NET Framework", "SQL Server"],
+                    liveDemo: "https://github.com/Vidusha78978/POS-system-shop.git",
+                    github: "https://github.com/Vidusha78978/POS-system-shop.git",
+                    icon: "fas fa-cash-register"
+                },
+                {
+                    title: "Living Miniatures",
+                    description: "An e-commerce website for a client specializing in miniature products, featuring a full shopping cart, payment gateway, and product management system.",
+                    techStack: ["WordPress", "WooCommerce", "SEO"],
+                    liveDemo: "https://livingminiatures.wuaze.com/",
+                    github: null,
+                    icon: "fas fa-store"
+                },
+                {
+                    title: "Magicyarn - WooCommerce Store",
+                    description: "A vibrant online store for a yarn and craft supplies business. Developed a custom theme and integrated advanced e-commerce functionalities.",
+                    techStack: ["WordPress", "WooCommerce", "Elementor"],
+                    liveDemo: "https://magicyarn.lovestoblog.com/",
+                    github: null,
+                    icon: "fas fa-shopping-basket"
+                },
+                {
+                    title: "StudyNest",
+                    description: "An educational platform built on WordPress, designed to deliver online courses. Integrated a Learning Management System (LMS) for course creation and student tracking.",
+                    techStack: ["WordPress", "LMS (LearnDash)", "PHP"],
+                    liveDemo: "https://studynest.byethost14.com/",
+                    github: null,
+                    icon: "fas fa-book-reader"
+                }
+            ]
+        };
+        // Add contact info dynamically
+        portfolioData.contact = [
+            {
+                title: "Resume",
+                details: "Download CV",
+                iconClass: "fas fa-file-download",
+                link: "https://drive.google.com/uc?id=1KFN-VKsfoY1QyN7Ka1DR2vfn4gbL7xzK",
+                animationDelay: "delay-[0ms]",
+                color: "bg-accent-purple hover:bg-violet-600",
+                download: true,
+            },
+            {
+                title: "Email",
+                details: "Send an Email",
+                iconClass: "fas fa-envelope",
+                link: "mailto:vidushachathuranga78978@gmail.com",
+                animationDelay: "delay-[100ms]",
+                color: "bg-red-600 hover:bg-red-700"
+            },
+            {
+                title: "WhatsApp",
+                details: "Message Me", 
+                iconClass: "fab fa-whatsapp",
+                link: `https://wa.me/${portfolioData.profile.whatsappNumber}`, 
+                animationDelay: "delay-[200ms]",
+                color: "bg-green-600 hover:bg-green-700"
+            },
+            {
+                title: "LinkedIn",
+                details: "Professional Profile",
+                iconClass: "fab fa-linkedin",
+                link: "https://www.linkedin.com/in/vidusha-chathuranga-51a334241",
+                animationDelay: "delay-[300ms]",
+                color: "bg-blue-600 hover:bg-blue-700"
+            },
+            {
+                title: "GitHub",
+                details: "Code & Projects",
+                iconClass: "fab fa-github",
+                link: "https://github.com/Vidusha78978",
+                animationDelay: "delay-[400ms]",
+                color: "bg-gray-700 hover:bg-gray-800"
+            },
+            {
+                title: "Facebook",
+                details: "Social Profile",
+                iconClass: "fab fa-facebook",
+                link: "https://web.facebook.com/vidusha.chathuranga.2025",
+                animationDelay: "delay-[500ms]",
+                color: "bg-blue-800 hover:bg-blue-900"
+            }
+        ];
+
+
+        // --- DYNAMIC RENDERING FUNCTIONS ---
+        
+        // Render Bio Details
+        function renderBioDetails() {
+            try {
+                const container = document.getElementById('bio-details');
+                const birthDate = new Date(portfolioData.profile.birthDate);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                const birthDateFormatted = birthDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+                container.innerHTML = `
+                    <h3 class="text-xl font-semibold text-text-light mb-4 text-center">Bio Details</h3>
+                    <ul class="space-y-3 text-text-muted">
+                        <li class="flex items-center"><i class="fas fa-birthday-cake w-6 text-center text-accent-purple mr-3"></i><strong class="text-text-light">${birthDateFormatted}</strong></li>
+                        <li class="flex items-center"><i class="fas fa-user-clock w-6 text-center text-accent-purple mr-3"></i><strong class="text-text-light">${age} Years Old</strong></li>
+                        <li class="flex items-center"><i class="fas fa-map-marker-alt w-6 text-center text-accent-purple mr-3"></i><strong class="text-text-light">${portfolioData.profile.city}</strong></li>
+                    </ul>
+                `;
+            } catch (error) {
+                console.error("Failed to render bio details:", error);
+            }
+        }
+
+        // Render Language Skills
+        function renderLanguageSkills() {
+            try {
+                const container = document.getElementById('language-skills');
+                container.innerHTML = `
+                    <h3 class="text-xl font-semibold text-text-light mb-4 text-center">Language Proficiency</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-base font-medium text-text-light">Sinhala</span>
+                                <span class="text-sm font-medium text-text-muted">Native</span>
+                            </div>
+                            <div class="w-full bg-primary-dark rounded-full h-2.5"><div class="bg-accent-blue h-2.5 rounded-full" style="width: 100%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-base font-medium text-text-light">English</span>
+                                <span class="text-sm font-medium text-text-muted">Conversational</span>
+                            </div>
+                            <div class="w-full bg-primary-dark rounded-full h-2.5"><div class="bg-accent-blue h-2.5 rounded-full" style="width: 75%"></div></div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error("Failed to render language skills:", error);
+            }
+        }
+        
+        // Render Core Skills
+        function renderSkills() {
+            try {
+                const container = document.getElementById('skills-container');
+                container.innerHTML = portfolioData.skills.map((skill, index) => `
+                    <div class="group bg-secondary-dark p-4 text-center rounded-xl shadow-lg border-2 border-transparent hover:border-accent-purple hover:bg-accent-purple transition duration-300 transform hover:-translate-y-2 fade-in-scroll" style="transition-delay: ${index * 50}ms">
+                        <i class="${skill.icon} text-4xl mb-2 ${skill.color} group-hover:text-white transition duration-300"></i>
+                        <p class="font-semibold text-text-light group-hover:text-white transition duration-300">${skill.name}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error("Failed to render skills:", error);
+            }
+        }
+        
+        // Render Experience and Education
+        function renderExperience() {
+            try {
+                const container = document.getElementById('experience-container');
+                container.innerHTML = portfolioData.experience.map((item, index) => `
+                    <div class="relative pl-10 fade-in-scroll" style="transition-delay: ${index * 100}ms">
+                        <div class="absolute left-4 top-1 transform -translate-x-1/2 w-4 h-4 ${item.type === 'Work' ? 'bg-accent-blue' : 'bg-accent-purple'} rounded-full border-4 border-primary-dark"></div>
+                        <div class="p-4 bg-secondary-dark rounded-xl shadow-lg">
+                            <h3 class="text-xl font-bold text-text-light flex items-center">
+                                <i class="${item.icon} mr-3 text-accent-blue"></i> ${item.title}
+                            </h3>
+                            <p class="text-text-muted font-semibold">
+                                ${item.institutionLink ? `<a href="${item.institutionLink}" target="_blank" rel="noopener noreferrer" class="hover:text-accent-purple hover:underline">${item.institution}</a>` : item.institution}
+                            </p>
+                            <p class="text-sm text-accent-blue font-mono mb-2">${item.period}</p>
+                            <p class="text-text-muted">${item.description}</p>
+                            ${item.results ? `
+                                <div class="mt-3 pt-3 border-t border-primary-dark">
+                                    <h4 class="font-semibold text-text-light mb-2">A/L Results:</h4>
+                                    <ul class="list-disc list-inside text-text-muted space-y-1">
+                                        ${item.results.map(res => `<li><strong>${res.subject}:</strong> ${res.grade}</li>`).join('')}
+                                    </ul>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error("Failed to render experience:", error);
+            }
+        }
+        
+        // Render Featured Projects
+        function renderProjects() {
+            try {
+                const container = document.getElementById('projects-container');
+                container.innerHTML = portfolioData.projects.map((project, index) => `
+                    <div class="bg-secondary-dark rounded-xl shadow-xl overflow-hidden flex flex-col fade-in-scroll" style="transition-delay: ${index * 100}ms">
+                        <div class="p-6 flex-grow">
+                            <div class="flex items-center mb-3">
+                                <i class="${project.icon} text-3xl text-accent-blue mr-4"></i>
+                                <h3 class="text-2xl font-bold text-text-light">${project.title}</h3>
+                            </div>
+                            <p class="text-text-muted mb-4">${project.description}</p>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                ${project.techStack.map(tech => `<span class="bg-primary-dark text-accent-blue text-xs font-mono px-2 py-1 rounded-full">${tech}</span>`).join('')}
+                            </div>
+                        </div>
+                        <div class="bg-primary-dark p-4 flex gap-4">
+                            ${project.liveDemo ? `<a href="${project.liveDemo}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center bg-accent-blue text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
+                                ${project.github === project.liveDemo ? 'View Source' : 'Live Demo'}
+                            </a>` : ''}
+                            ${project.github && project.github !== project.liveDemo ? `<a href="${project.github}" target="_blank" rel="noopener noreferrer" class="flex-1 text-center bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-300">GitHub</a>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error("Failed to render projects:", error);
+            }
+        }
+        
+        // Render Contact Information
+        function renderContact() {
+            try {
+                const container = document.getElementById('contact-container');
+                container.innerHTML = portfolioData.contact.map(item => `
+                    <a href="${item.link}" 
+                       ${item.download ? 'download' : 'target="_blank" rel="noopener noreferrer"'} 
+                       class="group ${item.color} p-6 text-center rounded-xl shadow-lg transition duration-300 transform hover:-translate-y-2 fade-in-scroll" 
+                       style="transition-delay: ${item.animationDelay}">
+                        <i class="${item.iconClass} text-5xl text-white mb-3 transition duration-300 transform group-hover:scale-110"></i>
+                        <h4 class="text-xl font-bold text-white">${item.title}</h4>
+                        <p class="text-gray-200">${item.details}</p>
+                    </a>
+                `).join('');
+            } catch (error) {
+                console.error("Failed to render contact info:", error);
+            }
+        }
+        
+        // --- ANIMATION & EVENT LISTENERS ---
+
+        // Function for role typing animation
+        function typeRoles() {
+            const roles = ["Full Stack Aspirant", "Versatile WordPress Developer", "Professional Resume Writer"];
+            let roleIndex = 0;
+            let charIndex = 0;
+            let isDeleting = false;
+            const typingSpeed = 100;
+            const deletingSpeed = 50;
+            const delayBetweenRoles = 1500;
+            const roleTextElement = document.getElementById('role-text');
+
+            function type() {
+                const currentRole = roles[roleIndex];
+                if (isDeleting) {
+                    roleTextElement.textContent = currentRole.substring(0, charIndex - 1);
+                    charIndex--;
+                } else {
+                    roleTextElement.textContent = currentRole.substring(0, charIndex + 1);
+                    charIndex++;
+                }
+
+                if (!isDeleting && charIndex === currentRole.length) {
+                    setTimeout(() => isDeleting = true, delayBetweenRoles);
+                } else if (isDeleting && charIndex === 0) {
+                    isDeleting = false;
+                    roleIndex = (roleIndex + 1) % roles.length;
+                }
+
+                const speed = isDeleting ? deletingSpeed : typingSpeed;
+                setTimeout(type, speed);
+            }
+            if(roleTextElement) type();
+        }
+
+        // Welcome Modal Logic
+        function showWelcomeModal() {
+            const modal = document.getElementById('welcome-modal');
+            if (modal && !sessionStorage.getItem('welcomeShown')) {
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.add('modal-enter-active'), 10);
+                
+                setTimeout(() => {
+                    hideWelcomeModal();
+                }, 4000); // Auto-hide after 4 seconds
+                
+                sessionStorage.setItem('welcomeShown', 'true');
+            }
+        }
+
+        function hideWelcomeModal() {
+            const modal = document.getElementById('welcome-modal');
+            if (modal) {
+                modal.classList.remove('modal-enter-active');
+                modal.classList.add('modal-exit-active');
+                setTimeout(() => modal.classList.add('hidden'), 500);
+            }
+        }
+        
+        // Main function to run on window load
+        window.onload = function() {
+            // Set footer year
+            document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+            // Render all dynamic sections
+            renderBioDetails();
+            renderLanguageSkills();
+            renderSkills();
+            renderExperience();
+            renderProjects();
+            renderContact();
+            
+            // Start the role typing animation
+            typeRoles();
+
+            // Setup fade-on-scroll animations AFTER content is rendered
+            const faders = document.querySelectorAll('.fade-in-scroll');
+            if ("IntersectionObserver" in window) {
+                const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                faders.forEach(fader => appearOnScroll.observe(fader));
+            } else {
+                // Fallback for older browsers
+                faders.forEach(fader => fader.classList.add('visible'));
+            }
+
+            // --- AMBIENT MUSIC LOGIC ---
+            const musicToggle = document.getElementById('musicToggle');
+            const musicIcon = document.getElementById('musicIcon');
+            let musicPlaying = false;
+            let synth;
+
+            musicToggle.addEventListener('click', async () => {
+                await Tone.start();
+                
+                if (!synth) {
+                     // NEW: Deep, slow, professional-sounding pad
+                    synth = new Tone.PolySynth(Tone.FMSynth, {
+                        harmonicity: 1.5,
+                        modulationIndex: 10,
+                        envelope: { attack: 2, decay: 1, sustain: 1, release: 4 },
+                        modulation: { type: "sine" },
+                        modulationEnvelope: { attack: 2, decay: 0.01, sustain: 1, release: 2 }
+                    }).toDestination();
+                    synth.volume.value = -24; // Lower volume
+                }
+
+                if (!musicPlaying) {
+                    // Soft G minor progression
+                    Tone.Transport.scheduleRepeat(time => {
+                        synth.triggerAttackRelease("G2", "4n", time);
+                        synth.triggerAttackRelease("Bb2", "4n", time + 1);
+                        synth.triggerAttackRelease("D3", "4n", time + 2);
+                        synth.triggerAttackRelease("F3", "4n", time + 3);
+                    }, "4m");
+                    
+                    Tone.Transport.start();
+                    musicPlaying = true;
+                    musicIcon.classList.remove('fa-volume-mute');
+                    musicIcon.classList.add('fa-volume-up');
+                } else {
+                    Tone.Transport.stop();
+                    Tone.Transport.cancel(); // Clear scheduled events
+                    musicPlaying = false;
+                    musicIcon.classList.remove('fa-volume-up');
+                    musicIcon.classList.add('fa-volume-mute');
+                }
+            });
+
+            // Show the welcome modal
+            showWelcomeModal();
+        };
+
+    </script>
+
+</body>
+</html>
 
