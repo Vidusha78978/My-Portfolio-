@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Section | Vidusha Chathuranga</title>
+    <!-- Site Icon (Favicon) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%238b5cf6'/><text x='50%' y='80%' font-size='85' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='bold'>V</text></svg>">
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Import Playfair Display from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Tailwind Configuration */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#0f172a',
+                        'secondary-dark': '#1e293b',
+                        'accent-blue': '#3b82f6',
+                        'accent-purple': '#8b5cf6',
+                        'text-light': '#f8fafc',
+                        'text-muted': '#94a3b8',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['"Playfair Display"', 'serif'],
+                    },
+                }
+            }
+        }
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- Header -->
+    <header class="bg-primary-dark/95 backdrop-blur-sm shadow-lg border-b border-secondary-dark">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <!-- Link back to the main portfolio page -->
+            <a href="index.html" class="text-xl font-bold text-accent-blue hover:text-accent-purple transition duration-300 flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Portfolio
+            </a>
+            <h1 class="text-xl font-display text-text-light flex items-center">
+                <i class="fas fa-user-secret mr-2"></i> Private Content
+            </h1>
+        </nav>
+    </header>
+
+    <main class="min-h-screen flex flex-col items-center justify-center p-4">
+        
+        <!-- Login Form Container -->
+        <div id="login-container" class="bg-secondary-dark p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border-2 border-accent-purple">
+            <i class="fas fa-shield-alt text-5xl text-accent-blue mb-4"></i>
+            <h2 class="text-3xl font-bold font-display text-accent-purple mb-2">Access Restricted</h2>
+            <p class="text-text-muted mb-6">This page is password protected. Please enter the password to continue.</p>
+            <form onsubmit="event.preventDefault(); checkPassword();">
+                <div class="relative">
+                    <input type="password" id="password-input" class="w-full bg-primary-dark border-2 border-gray-600 rounded-lg py-3 px-4 text-text-light focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-transparent transition" placeholder="Enter Password">
+                    <button type="button" onclick="togglePasswordVisibility()" class="absolute top-1/2 right-3 -translate-y-1/2 text-text-muted hover:text-accent-blue">
+                        <i id="password-toggle-icon" class="fas fa-eye"></i>
+                    </button>
+                </div>
+                <button type="submit" class="mt-6 w-full px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
+                    Unlock Content
+                </button>
+            </form>
+            <p id="error-message" class="text-red-500 mt-4 h-5"></p>
+            <button onclick="resetPassword()" class="text-sm text-text-muted hover:text-accent-blue mt-4 underline">Forgot Password?</button>
+        </div>
+
+        <!-- Protected Content Container (Initially Hidden) -->
+        <div id="protected-content" class="hidden w-full max-w-4xl text-center">
+             <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl border-2 border-accent-purple">
+                <i class="fas fa-lock-open text-5xl text-green-500 mb-4"></i>
+                <h2 class="text-4xl font-bold font-display text-green-400 mb-4">Access Granted</h2>
+                <p class="text-text-light mb-6">This is your private space. You can add personal notes, files, or any content you want to keep secure here.</p>
+                
+                <!-- Placeholder for your private content -->
+                <div class="text-left space-y-4">
+                    <div class="p-4 bg-primary-dark rounded-lg">
+                        <h3 class="font-semibold text-accent-blue">My Private Journal Entry</h3>
+                        <p class="text-text-muted">Today was a productive day. I worked on my portfolio and learned how to implement password protection with JavaScript...</p>
+                    </div>
+                     <div class="p-4 bg-primary-dark rounded-lg">
+                        <h3 class="font-semibold text-accent-blue">Secure Links</h3>
+                        <a href="#" class="text-accent-purple hover:underline">Private Document Link</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    
+    <script>
+        // Store the correct password. In a real application, this would not be stored in plaintext.
+        const correctPassword = "64020134@Vidu";
+        
+        function checkPassword() {
+            const passwordInput = document.getElementById('password-input').value;
+            const errorMessage = document.getElementById('error-message');
+            
+            if (passwordInput === correctPassword) {
+                // Hide login and show content
+                document.getElementById('login-container').classList.add('hidden');
+                document.getElementById('protected-content').classList.remove('hidden');
+                errorMessage.textContent = '';
+            } else {
+                errorMessage.textContent = 'Incorrect password. Please try again.';
+                // Add a shake animation for wrong password
+                const loginContainer = document.getElementById('login-container');
+                loginContainer.classList.add('animate-shake');
+                setTimeout(() => loginContainer.classList.remove('animate-shake'), 500);
+            }
+        }
+
+        function resetPassword() {
+            // This is a simple alert-based reset feature. 
+            // In a real-world scenario, this would trigger an email or a more secure process.
+            alert("Password Reset Hint: Your password is your G.C.E O/L Index Number followed by '@' and your first name with a capital letter.");
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password-input');
+            const icon = document.getElementById('password-toggle-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Add shake animation style to head for wrong password feedback
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            .animate-shake {
+                animation: shake 0.5s ease-in-out;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
