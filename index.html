@@ -36,6 +36,8 @@
                     animation: {
                         'fade-in': 'fadeIn 0.8s ease-out forwards',
                         'slide-up': 'slideUp 0.6s ease-out forwards',
+                        'menu-enter': 'menuEnter 0.3s ease-out forwards',
+                        'menu-exit': 'menuExit 0.3s ease-in forwards'
                     },
                     keyframes: {
                         fadeIn: {
@@ -44,8 +46,17 @@
                         },
                         slideUp: {
                             '0%': { transform: 'translateY(20px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1', },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
                         },
+                        /* Animations for mobile menu */
+                        menuEnter: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' }
+                        },
+                        menuExit: {
+                            '0%': { opacity: '1', transform: 'scale(1)' },
+                            '100%': { opacity: '0', transform: 'scale(0.95)' }
+                        }
                     }
                 }
             }
@@ -108,6 +119,27 @@
 </head>
 <body class="font-sans">
 
+    <!-- NEW: Mobile Menu (Hidden by default) -->
+    <div id="mobile-menu" class="hidden fixed inset-0 z-[100] bg-primary-dark/95 backdrop-blur-lg p-8 flex flex-col items-center justify-center animate-menu-enter">
+        <button id="mobile-menu-close" class="absolute top-6 right-6 text-text-light text-3xl p-2 hover:text-red-500 transition">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="flex flex-col items-center space-y-8">
+            <a href="#about" class="mobile-nav-link text-text-light hover:text-accent-blue transition duration-300 font-medium text-3xl">About</a>
+            <a href="#skills" class="mobile-nav-link text-text-light hover:text-accent-blue transition duration-300 font-medium text-3xl">Skills</a>
+            <a href="#experience" class="mobile-nav-link text-text-light hover:text-accent-blue transition duration-300 font-medium text-3xl">Experience</a>
+            <a href="#licenses-certs" class="mobile-nav-link text-text-light hover:text-accent-blue transition duration-300 font-medium text-3xl">Licenses</a>
+            <a href="#projects" class="mobile-nav-link text-text-light hover:text-accent-blue transition duration-300 font-medium text-3xl">Projects</a>
+            <a href="gallery.html" target="_blank" rel="noopener noreferrer" class="text-text-light hover:text-accent-blue transition duration-300 font-medium text-3xl">Gallery</a>
+            <a href="#contact" class="mobile-nav-link text-text-light hover:text-accent-blue transition duration-300 font-medium text-3xl">Contact</a>
+            <a href="me.html" target="_blank" rel="noopener noreferrer" class="text-text-light hover:text-accent-blue transition duration-300 font-medium flex items-center text-3xl" title="Private Section">
+                <i class="fas fa-lock mr-2"></i>Me
+            </a>
+        </div>
+    </div>
+    <!-- END Mobile Menu -->
+
+
     <!-- Welcome Greeting Modal -->
     <div id="welcome-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-primary-dark/80 backdrop-blur-sm modal-enter hidden">
         <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border-2 border-accent-purple transform transition duration-500">
@@ -133,6 +165,8 @@
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <!-- Internal link, no target="_blank" -->
             <a href="#home" class="text-2xl font-bold text-accent-blue hover:text-accent-purple transition duration-300">Vidusha C.</a>
+            
+            <!-- Desktop Navigation: Hides on mobile (hidden), shows on medium screens and up (md:flex) -->
             <div class="space-x-4 hidden md:flex items-center">
                 <!-- Internal links, no target="_blank" -->
                 <a href="#about" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">About</a>
@@ -140,14 +174,20 @@
                 <a href="#experience" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Experience</a>
                 <a href="#licenses-certs" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Licenses</a>
                 <a href="#projects" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Projects</a>
-                <a href="gallery.html" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Gallery</a>
+                <a href="gallery.html" target="_blank" rel="noopener noreferrer" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Gallery</a>
                 <a href="#contact" class="text-text-light hover:text-accent-blue transition duration-300 font-medium">Contact</a>
                 <!-- Link to the private page -->
-                <a href="me.html" class="text-text-light hover:text-accent-blue transition duration-300 font-medium flex items-center" title="Private Section">
+                <a href="me.html" target="_blank" rel="noopener noreferrer" class="text-text-light hover:text-accent-blue transition duration-300 font-medium flex items-center" title="Private Section">
                     <i class="fas fa-lock mr-2"></i>Me
                 </a>
             </div>
-            <!-- Mobile Menu Placeholder -->
+            
+            <!-- NEW: Mobile Menu Button (Hamburger Icon) -->
+            <!-- Hides on medium screens (md:hidden) -->
+            <button id="mobile-menu-button" class="md:hidden text-text-light text-2xl p-2 hover:text-accent-blue transition">
+                <i class="fas fa-bars"></i>
+            </button>
+
         </nav>
     </header>
 
@@ -156,6 +196,7 @@
         <!-- 1. Hero Section -->
         <section id="home" class="min-h-[80vh] flex flex-col justify-center items-center text-center pt-16">
             <div class="animate-fade-in space-y-6">
+                <!-- Responsive typography -->
                 <h1 class="text-6xl sm:text-7xl lg:text-8xl font-extrabold text-white leading-tight bg-clip-text text-transparent bg-gradient-to-r from-accent-blue to-accent-purple font-display">
                     Vidusha Chathuranga
                 </h1>
@@ -168,7 +209,7 @@
                 <!-- End Dynamic Role Display -->
 
                 <!-- Internal link, no target="_blank" -->
-                <a href="#projects" class="inline-block px-8 py-3 mt-8 text-lg font-semibold text-white bg-accent-purple rounded-full shadow-lg shadow-violet-500/50 hover:bg-violet-600 transition duration-300 transform hover:scale-105">
+                <a href="#projects" class="inline-block px-8 py-3 mt-8 text-lg font-semibold text-white bg-accent-purple rounded-full shadow-lg shadow-violet-500/50 hover:bg-violet-600 transition duration-300 transform hover:scale-105 animate-slide-up">
                     View My Work <i class="fas fa-arrow-right ml-2"></i>
                 </a>
             </div>
@@ -179,6 +220,7 @@
             <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
                 <i class="fas fa-user-circle mr-3"></i> About Me
             </h2>
+            <!-- Responsive Grid: Stacks on mobile, 2 columns on medium screens -->
             <div class="grid md:grid-cols-2 gap-12 items-start">
                 <!-- Profile Summary (Left Column) -->
                 <div class="space-y-6 fade-in-scroll">
@@ -230,6 +272,7 @@
             <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
                 <i class="fas fa-cogs mr-3"></i> Core Skills
             </h2>
+            <!-- Responsive Grid: 2 cols on mobile, 3 on sm, 4 on md, 5 on lg -->
             <div id="skills-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
                 <!-- Skills will be rendered here by JavaScript -->
             </div>
@@ -247,11 +290,12 @@
             </div>
         </section>
         
-        <!-- NEW: Licenses & Certifications Section -->
+        <!-- 5. Licenses & Certifications Section -->
         <section id="licenses-certs" class="py-12 border-t border-secondary-dark">
             <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
                 <i class="fas fa-award mr-3"></i> Licenses & Certificates
             </h2>
+            <!-- Responsive Container: Centered and max-width -->
             <div class="bg-secondary-dark p-8 rounded-xl shadow-xl text-center max-w-2xl mx-auto fade-in-scroll">
                  <i class="fas fa-shield-alt text-5xl text-accent-purple mb-4"></i>
                 <h3 class="text-2xl font-semibold text-text-light mb-3">View My Credentials</h3>
@@ -265,17 +309,18 @@
             </div>
         </section>
 
-        <!-- 5. Featured Projects Section -->
+        <!-- 6. Featured Projects Section -->
         <section id="projects" class="py-12 border-t border-secondary-dark">
             <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
                 <i class="fas fa-project-diagram mr-3"></i> Featured Projects
             </h2>
+            <!-- Responsive Grid: Stacks on mobile, 2 columns on medium screens -->
             <div id="projects-container" class="grid md:grid-cols-2 gap-8">
                 <!-- Projects will be rendered here by JavaScript -->
             </div>
         </section>
 
-        <!-- 6. Gallery Section -->
+        <!-- 7. Gallery Section (Placeholder) -->
         <section id="gallery" class="py-12 border-t border-secondary-dark">
             <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
                 <i class="fas fa-images mr-3"></i> Gallery
@@ -283,14 +328,18 @@
             <div class="text-center text-text-muted fade-in-scroll">
                 <p>This section is currently under construction.</p>
                 <p>Check back soon to see visual showcases of my work!</p>
+                <a href="gallery.html" target="_blank" rel="noopener noreferrer" class="inline-block mt-4 px-6 py-3 bg-accent-purple text-white font-semibold rounded-lg shadow-lg hover:bg-violet-600 transition duration-300 transform hover:scale-105">
+                    Open Gallery Page <i class="fas fa-external-link-alt ml-2"></i>
+                </a>
             </div>
         </section>
 
-        <!-- 7. Get In Touch Section -->
+        <!-- 8. Get In Touch Section -->
         <section id="contact" class="py-12 border-t border-secondary-dark">
             <h2 class="text-4xl font-bold text-accent-blue mb-10 text-center fade-in-scroll">
                 <i class="fas fa-envelope-open-text mr-3"></i> Get In Touch
             </h2>
+            <!-- Responsive Grid: 1 col on mobile, 2 on sm, 3 on md -->
             <div id="contact-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
                 <!-- Contact items will be rendered here -->
             </div>
@@ -408,7 +457,7 @@
                 },
                 {
                     title: "StudyNest",
-                    description: "An educational platform built on WordPress, designed to deliver online courses. Integrated a Learning Management System (LMS) for course creation and student tracking.",
+                    description: "An educational platform built on WordPress, built to deliver online courses. Integrated a Learning Management System (LMS) for course creation and student tracking.",
                     techStack: ["WordPress", "LMS (LearnDash)", "PHP"],
                     liveDemo: "https://studynest.byethost14.com/",
                     github: null,
@@ -476,6 +525,7 @@
         function renderBioDetails() {
             try {
                 const container = document.getElementById('bio-details');
+                if (!container) return;
                 const birthDate = new Date(portfolioData.profile.birthDate);
                 const today = new Date();
                 let age = today.getFullYear() - birthDate.getFullYear();
@@ -502,6 +552,7 @@
         function renderLanguageSkills() {
             try {
                 const container = document.getElementById('language-skills');
+                if (!container) return;
                 container.innerHTML = `
                     <h3 class="text-xl font-semibold text-text-light mb-4 text-center">Language Proficiency</h3>
                     <div class="space-y-4">
@@ -530,6 +581,7 @@
         function renderSkills() {
             try {
                 const container = document.getElementById('skills-container');
+                if (!container) return;
                 container.innerHTML = portfolioData.skills.map((skill, index) => `
                     <div class="group bg-secondary-dark p-4 text-center rounded-xl shadow-lg border-2 border-transparent hover:border-accent-purple hover:bg-accent-purple transition duration-300 transform hover:-translate-y-2 fade-in-scroll" style="transition-delay: ${index * 50}ms">
                         <i class="${skill.icon} text-4xl mb-2 ${skill.color} group-hover:text-white transition duration-300"></i>
@@ -545,6 +597,7 @@
         function renderExperience() {
             try {
                 const container = document.getElementById('experience-container');
+                if (!container) return;
                 container.innerHTML = portfolioData.experience.map((item, index) => `
                     <div class="relative pl-10 fade-in-scroll" style="transition-delay: ${index * 100}ms">
                         <div class="absolute left-4 top-1 transform -translate-x-1/2 w-4 h-4 ${item.type === 'Work' ? 'bg-accent-blue' : 'bg-accent-purple'} rounded-full border-4 border-primary-dark"></div>
@@ -577,6 +630,7 @@
         function renderProjects() {
             try {
                 const container = document.getElementById('projects-container');
+                if (!container) return;
                 container.innerHTML = portfolioData.projects.map((project, index) => `
                     <div class="bg-secondary-dark rounded-xl shadow-xl overflow-hidden flex flex-col fade-in-scroll" style="transition-delay: ${index * 100}ms">
                         <div class="p-6 flex-grow">
@@ -606,6 +660,7 @@
         function renderContact() {
             try {
                 const container = document.getElementById('contact-container');
+                if (!container) return;
                 container.innerHTML = portfolioData.contact.map(item => `
                     <a href="${item.link}" 
                        ${item.download ? 'download' : 'target="_blank" rel="noopener noreferrer"'} 
@@ -625,141 +680,204 @@
 
         // Function for role typing animation
         function typeRoles() {
-            const roles = ["Full Stack Aspirant", "Versatile WordPress Developer", "Professional Resume Writer"];
-            let roleIndex = 0;
-            let charIndex = 0;
-            let isDeleting = false;
-            const typingSpeed = 100;
-            const deletingSpeed = 50;
-            const delayBetweenRoles = 1500;
-            const roleTextElement = document.getElementById('role-text');
+            try {
+                const roles = ["Full Stack Aspirant", "Versatile WordPress Developer", "Professional Resume Writer"];
+                let roleIndex = 0;
+                let charIndex = 0;
+                let isDeleting = false;
+                const typingSpeed = 100;
+                const deletingSpeed = 50;
+                const delayBetweenRoles = 1500;
+                const roleTextElement = document.getElementById('role-text');
+                if(!roleTextElement) return; // Guard clause
 
-            function type() {
-                const currentRole = roles[roleIndex];
-                if (isDeleting) {
-                    roleTextElement.textContent = currentRole.substring(0, charIndex - 1);
-                    charIndex--;
-                } else {
-                    roleTextElement.textContent = currentRole.substring(0, charIndex + 1);
-                    charIndex++;
+                function type() {
+                    const currentRole = roles[roleIndex];
+                    if (isDeleting) {
+                        roleTextElement.textContent = currentRole.substring(0, charIndex - 1);
+                        charIndex--;
+                    } else {
+                        roleTextElement.textContent = currentRole.substring(0, charIndex + 1);
+                        charIndex++;
+                    }
+
+                    if (!isDeleting && charIndex === currentRole.length) {
+                        setTimeout(() => isDeleting = true, delayBetweenRoles);
+                    } else if (isDeleting && charIndex === 0) {
+                        isDeleting = false;
+                        roleIndex = (roleIndex + 1) % roles.length;
+                    }
+
+                    const speed = isDeleting ? deletingSpeed : typingSpeed;
+                    setTimeout(type, speed);
                 }
-
-                if (!isDeleting && charIndex === currentRole.length) {
-                    setTimeout(() => isDeleting = true, delayBetweenRoles);
-                } else if (isDeleting && charIndex === 0) {
-                    isDeleting = false;
-                    roleIndex = (roleIndex + 1) % roles.length;
-                }
-
-                const speed = isDeleting ? deletingSpeed : typingSpeed;
-                setTimeout(type, speed);
-            }
-            if(roleTextElement) type();
+                type();
+            } catch(e) { console.error("Typing animation failed:", e); }
         }
 
         // Welcome Modal Logic
         function showWelcomeModal() {
-            const modal = document.getElementById('welcome-modal');
-            if (modal && !sessionStorage.getItem('welcomeShown')) {
-                modal.classList.remove('hidden');
-                setTimeout(() => modal.classList.add('modal-enter-active'), 10);
-                
-                setTimeout(() => {
-                    hideWelcomeModal();
-                }, 4000); // Auto-hide after 4 seconds
-                
-                sessionStorage.setItem('welcomeShown', 'true');
+            try {
+                const modal = document.getElementById('welcome-modal');
+                if (modal && !sessionStorage.getItem('welcomeShown')) {
+                    modal.classList.remove('hidden');
+                    setTimeout(() => modal.classList.add('modal-enter-active'), 10);
+                    
+                    setTimeout(() => {
+                        hideWelcomeModal();
+                    }, 4000); // Auto-hide after 4 seconds
+                    
+                    sessionStorage.setItem('welcomeShown', 'true');
+                }
+            } catch(e) {
+                console.error("Error showing welcome modal:", e);
             }
         }
 
         function hideWelcomeModal() {
-            const modal = document.getElementById('welcome-modal');
-            if (modal) {
-                modal.classList.remove('modal-enter-active');
-                modal.classList.add('modal-exit-active');
-                setTimeout(() => modal.classList.add('hidden'), 500);
+            try {
+                const modal = document.getElementById('welcome-modal');
+                if (modal) {
+                    modal.classList.remove('modal-enter-active');
+                    modal.classList.add('modal-exit-active');
+                    setTimeout(() => modal.classList.add('hidden'), 500);
+                }
+            } catch (e) {
+                console.error("Error hiding welcome modal:", e);
             }
         }
         
         // Main function to run on window load
         window.onload = function() {
-            // Set footer year
-            document.getElementById('footer-year').textContent = new Date().getFullYear();
-
-            // Render all dynamic sections
-            renderBioDetails();
-            renderLanguageSkills();
-            renderSkills();
-            renderExperience();
-            renderProjects();
-            renderContact();
             
-            // Start the role typing animation
-            typeRoles();
+            try {
+                const yearSpan = document.getElementById('footer-year');
+                if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+            } catch (e) { console.error("Footer year error:", e); }
+            
+            // IMPROVED: Wrapped each render function in its own try/catch
+            // This prevents one failing function from stopping the others.
+            try { renderBioDetails(); } catch (e) { console.error("renderBioDetails failed:", e); }
+            try { renderLanguageSkills(); } catch (e) { console.error("renderLanguageSkills failed:", e); }
+            try { renderSkills(); } catch (e) { console.error("renderSkills failed:", e); }
+            try { renderExperience(); } catch (e) { console.error("renderExperience failed:", e); }
+            try { renderProjects(); } catch (e) { console.error("renderProjects failed:", e); }
+            try { renderContact(); } catch (e) { console.error("renderContact failed:", e); }
+            try { typeRoles(); } catch (e) { console.error("typeRoles failed:", e); }
 
+            
             // Setup fade-on-scroll animations AFTER content is rendered
-            const faders = document.querySelectorAll('.fade-in-scroll');
-            if ("IntersectionObserver" in window) {
-                const appearOnScroll = new IntersectionObserver(function(entries, observer) {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('visible');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.1 });
+            try {
+                const faders = document.querySelectorAll('.fade-in-scroll');
+                if ("IntersectionObserver" in window) {
+                    const appearOnScroll = new IntersectionObserver(function(entries, observer) {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('visible');
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    }, { threshold: 0.1 }); // Trigger when 10% of the element is visible
 
-                faders.forEach(fader => appearOnScroll.observe(fader));
-            } else {
-                // Fallback for older browsers
-                faders.forEach(fader => fader.classList.add('visible'));
-            }
+                    faders.forEach(fader => {
+                        if (fader) appearOnScroll.observe(fader);
+                    });
+                } else {
+                    // Fallback for older browsers
+                    faders.forEach(fader => {
+                        if (fader) fader.classList.add('visible');
+                    });
+                }
+            } catch (e) { console.error("IntersectionObserver failed:", e); }
+
 
             // --- AMBIENT MUSIC LOGIC ---
-            const musicToggle = document.getElementById('musicToggle');
-            const musicIcon = document.getElementById('musicIcon');
-            let musicPlaying = false;
-            let synth;
+            try {
+                const musicToggle = document.getElementById('musicToggle');
+                const musicIcon = document.getElementById('musicIcon');
+                if (musicToggle && musicIcon) {
+                    let musicPlaying = false;
+                    let synth;
 
-            musicToggle.addEventListener('click', async () => {
-                await Tone.start();
-                
-                if (!synth) {
-                     // NEW: Deep, slow, professional-sounding pad
-                    synth = new Tone.PolySynth(Tone.FMSynth, {
-                        harmonicity: 1.5,
-                        modulationIndex: 10,
-                        envelope: { attack: 2, decay: 1, sustain: 1, release: 4 },
-                        modulation: { type: "sine" },
-                        modulationEnvelope: { attack: 2, decay: 0.01, sustain: 1, release: 2 }
-                    }).toDestination();
-                    synth.volume.value = -24; // Lower volume
-                }
+                    musicToggle.addEventListener('click', async () => {
+                        try {
+                            await Tone.start();
+                        
+                            if (!synth) {
+                                synth = new Tone.PolySynth(Tone.FMSynth, {
+                                    harmonicity: 1.5,
+                                    modulationIndex: 10,
+                                    envelope: { attack: 2, decay: 1, sustain: 1, release: 4 },
+                                    modulation: { type: "sine" },
+                                    modulationEnvelope: { attack: 2, decay: 0.01, sustain: 1, release: 2 }
+                                }).toDestination();
+                                synth.volume.value = -24; // Lower volume
+                            }
 
-                if (!musicPlaying) {
-                    // Soft G minor progression
-                    Tone.Transport.scheduleRepeat(time => {
-                        synth.triggerAttackRelease("G2", "4n", time);
-                        synth.triggerAttackRelease("Bb2", "4n", time + 1);
-                        synth.triggerAttackRelease("D3", "4n", time + 2);
-                        synth.triggerAttackRelease("F3", "4n", time + 3);
-                    }, "4m");
-                    
-                    Tone.Transport.start();
-                    musicPlaying = true;
-                    musicIcon.classList.remove('fa-volume-mute');
-                    musicIcon.classList.add('fa-volume-up');
-                } else {
-                    Tone.Transport.stop();
-                    Tone.Transport.cancel(); // Clear scheduled events
-                    musicPlaying = false;
-                    musicIcon.classList.remove('fa-volume-up');
-                    musicIcon.classList.add('fa-volume-mute');
+                            if (!musicPlaying) {
+                                Tone.Transport.scheduleRepeat(time => {
+                                    synth.triggerAttackRelease("G2", "4n", time);
+                                    synth.triggerAttackRelease("Bb2", "4n", time + 1);
+                                    synth.triggerAttackRelease("D3", "4n", time + 2);
+                                    synth.triggerAttackRelease("F3", "4n", time + 3);
+                                }, "4m");
+                                
+                                Tone.Transport.start();
+                                musicPlaying = true;
+                                musicIcon.classList.remove('fa-volume-mute');
+                                musicIcon.classList.add('fa-volume-up');
+                            } else {
+                                Tone.Transport.stop();
+                                Tone.Transport.cancel(); // Clear scheduled events
+                                musicPlaying = false;
+                                musicIcon.classList.remove('fa-volume-up');
+                                musicIcon.classList.add('fa-volume-mute');
+                            }
+                        } catch (e) { console.error("Tone.js error:", e); }
+                    });
                 }
-            });
+            } catch (e) { console.error("Music toggle setup failed:", e); }
 
             // Show the welcome modal
-            showWelcomeModal();
+            try {
+                showWelcomeModal();
+            } catch (e) {
+                console.error("Error showing welcome modal:", e);
+            }
+
+            // --- NEW: MOBILE MENU LOGIC ---
+            try {
+                const mobileMenuButton = document.getElementById('mobile-menu-button');
+                const mobileMenuClose = document.getElementById('mobile-menu-close');
+                const mobileMenu = document.getElementById('mobile-menu');
+                const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+                if (mobileMenuButton && mobileMenuClose && mobileMenu) {
+                    mobileMenuButton.addEventListener('click', () => {
+                        mobileMenu.classList.remove('hidden');
+                        mobileMenu.classList.remove('animate-menu-exit');
+                        mobileMenu.classList.add('animate-menu-enter');
+                    });
+
+                    const closeMenu = () => {
+                        mobileMenu.classList.remove('animate-menu-enter');
+                        mobileMenu.classList.add('animate-menu-exit');
+                        setTimeout(() => {
+                            mobileMenu.classList.add('hidden');
+                        }, 300); // Match animation duration
+                    };
+
+                    mobileMenuClose.addEventListener('click', closeMenu);
+
+                    // Add event listeners to all mobile nav links to close the menu on click
+                    mobileNavLinks.forEach(link => {
+                        // Only add for anchor links, not external links
+                        if (link.getAttribute('href').startsWith('#')) {
+                            link.addEventListener('click', closeMenu);
+                        }
+                    });
+                }
+            } catch(e) { console.error("Mobile menu setup failed:", e); }
         };
 
     </script>

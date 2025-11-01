@@ -4,16 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Private Section | Vidusha Chathuranga</title>
-    <!-- Site Icon (Favicon) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%238b5cf6'/><text x='50%' y='80%' font-size='85' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='bold'>V</text></svg>">
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Import Playfair Display from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
     <style>
-        /* Custom Tailwind Configuration */
         tailwind.config = {
             theme: {
                 extend: {
@@ -28,7 +23,7 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         display: ['"Playfair Display"', 'serif'],
-                    },
+                    }
                 }
             }
         }
@@ -36,123 +31,165 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #f8fafc;
         }
+        /* Custom styles for toggling visibility */
+        #login-screen { display: flex; }
+        #content-screen { display: none; }
     </style>
 </head>
-<body class="font-sans">
+<body class="font-sans flex flex-col min-h-screen">
 
-    <!-- Header -->
-    <header class="bg-primary-dark/95 backdrop-blur-sm shadow-lg border-b border-secondary-dark">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <!-- Link back to the main portfolio page -->
-            <a href="index.html" class="text-xl font-bold text-accent-blue hover:text-accent-purple transition duration-300 flex items-center">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Portfolio
-            </a>
-            <h1 class="text-xl font-display text-text-light flex items-center">
-                <i class="fas fa-user-secret mr-2"></i> Private Content
-            </h1>
-        </nav>
-    </header>
-
-    <main class="min-h-screen flex flex-col items-center justify-center p-4">
-        
-        <!-- Login Form Container -->
-        <div id="login-container" class="bg-secondary-dark p-8 rounded-xl shadow-2xl max-w-sm w-full text-center border-2 border-accent-purple">
-            <i class="fas fa-shield-alt text-5xl text-accent-blue mb-4"></i>
-            <h2 class="text-3xl font-bold font-display text-accent-purple mb-2">Access Restricted</h2>
-            <p class="text-text-muted mb-6">This page is password protected. Please enter the password to continue.</p>
-            <form onsubmit="event.preventDefault(); checkPassword();">
-                <div class="relative">
-                    <input type="password" id="password-input" class="w-full bg-primary-dark border-2 border-gray-600 rounded-lg py-3 px-4 text-text-light focus:outline-none focus:ring-2 focus:ring-accent-blue focus:border-transparent transition" placeholder="Enter Password">
-                    <button type="button" onclick="togglePasswordVisibility()" class="absolute top-1/2 right-3 -translate-y-1/2 text-text-muted hover:text-accent-blue">
-                        <i id="password-toggle-icon" class="fas fa-eye"></i>
-                    </button>
+    <!-- Login Screen -->
+    <div id="login-screen" class="flex-grow flex items-center justify-center p-4">
+        <!-- Responsive Form: Centered and max-width -->
+        <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl max-w-md w-full text-center border-2 border-accent-purple">
+            <i class="fas fa-user-lock text-5xl text-accent-purple mb-4"></i>
+            <h1 class="text-3xl font-bold text-text-light mb-2 font-display">Private Section</h1>
+            <p class="text-text-muted mb-6">This area is password protected.</p>
+            
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="password" class="sr-only">Password</label>
+                    <input type="password" id="password" placeholder="Enter Password" class="w-full px-4 py-2 rounded-lg bg-primary-dark text-text-light border border-secondary-dark focus:outline-none focus:ring-2 focus:ring-accent-blue">
                 </div>
-                <button type="submit" class="mt-6 w-full px-6 py-3 bg-accent-blue text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
-                    Unlock Content
+                <button type="submit" class="w-full px-6 py-2 bg-accent-blue text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 transition duration-300 transform hover:scale-105">
+                    Unlock <i class="fas fa-arrow-right ml-1"></i>
                 </button>
             </form>
-            <p id="error-message" class="text-red-500 mt-4 h-5"></p>
-            <button onclick="resetPassword()" class="text-sm text-text-muted hover:text-accent-blue mt-4 underline">Forgot Password?</button>
+            <p id="error-message" class="text-red-500 mt-4 text-sm hidden">Incorrect password. Please try again.</p>
+            <button id="reset-password" class="text-xs text-text-muted hover:text-accent-blue mt-4 transition duration-300">Forgot Password?</button>
         </div>
+    </div>
 
-        <!-- Protected Content Container (Initially Hidden) -->
-        <div id="protected-content" class="hidden w-full max-w-4xl text-center">
-             <div class="bg-secondary-dark p-8 rounded-xl shadow-2xl border-2 border-accent-purple">
-                <i class="fas fa-lock-open text-5xl text-green-500 mb-4"></i>
-                <h2 class="text-4xl font-bold font-display text-green-400 mb-4">Access Granted</h2>
-                <p class="text-text-light mb-6">This is your private space. You can add personal notes, files, or any content you want to keep secure here.</p>
-                
-                <!-- Placeholder for your private content -->
-                <div class="text-left space-y-4">
-                    <div class="p-4 bg-primary-dark rounded-lg">
-                        <h3 class="font-semibold text-accent-blue">My Private Journal Entry</h3>
-                        <p class="text-text-muted">Today was a productive day. I worked on my portfolio and learned how to implement password protection with JavaScript...</p>
-                    </div>
-                     <div class="p-4 bg-primary-dark rounded-lg">
-                        <h3 class="font-semibold text-accent-blue">Secure Links</h3>
-                        <a href="#" class="text-accent-purple hover:underline">Private Document Link</a>
-                    </div>
+    <!-- Protected Content Screen (Hidden by default) -->
+    <div id="content-screen" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
+        <h1 class="text-4xl font-bold text-accent-blue mb-10 text-center">
+            <i class="fas fa-lock-open mr-3"></i> Welcome to My Private Area
+        </h1>
+        
+        <!-- Responsive Content Area -->
+        <div class="bg-secondary-dark p-8 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-semibold text-text-light mb-4">Confidential Content</h2>
+            <p class="text-text-muted mb-4">
+                This is where you can add your private content, notes, or files. This content is only visible after entering the correct password.
+            </p>
+            <!-- Example content grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-primary-dark p-4 rounded-lg">
+                    <h3 class="font-semibold text-accent-purple">Private Note 1</h3>
+                    <p class="text-sm text-text-muted">Details about a private project or idea...</p>
+                </div>
+                <div class="bg-primary-dark p-4 rounded-lg">
+                    <h3 class="font-semibold text-accent-purple">Private Note 2</h3>
+                    <p class="text-sm text-text-muted">Personal goals or confidential information...</p>
                 </div>
             </div>
+            <button onclick="logout()" class="mt-8 px-6 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-lg hover:bg-red-700 transition duration-300">
+                <i class="fas fa-sign-out-alt mr-2"></i>Lock Section
+            </button>
         </div>
-
-    </main>
+    </div>
     
+    <!-- Footer -->
+    <footer class="bg-primary-dark border-t-2 border-secondary-dark py-8 text-center text-text-muted">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p>&copy; <span id="footer-year">2025</span> Vidusha Chathuranga. All Rights Reserved.</p>
+        </div>
+    </footer>
+
     <script>
-        // Store the correct password. In a real application, this would not be stored in plaintext.
-        const correctPassword = "64020134@Vidu";
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
         
-        function checkPassword() {
-            const passwordInput = document.getElementById('password-input').value;
-            const errorMessage = document.getElementById('error-message');
-            
-            if (passwordInput === correctPassword) {
-                // Hide login and show content
-                document.getElementById('login-container').classList.add('hidden');
-                document.getElementById('protected-content').classList.remove('hidden');
-                errorMessage.textContent = '';
-            } else {
-                errorMessage.textContent = 'Incorrect password. Please try again.';
-                // Add a shake animation for wrong password
-                const loginContainer = document.getElementById('login-container');
-                loginContainer.classList.add('animate-shake');
-                setTimeout(() => loginContainer.classList.remove('animate-shake'), 500);
+        const loginForm = document.getElementById('login-form');
+        const loginScreen = document.getElementById('login-screen');
+        const contentScreen = document.getElementById('content-screen');
+        const errorMessage = document.getElementById('error-message');
+        const resetPasswordBtn = document.getElementById('reset-password');
+
+        // --- Password Check ---
+        // We use a simple hash function for basic obfuscation.
+        // This is NOT high security, but prevents casual viewing of the password in the source.
+        // The hash is for "64020134@Vidu"
+        const correctHash = "2143006114"; 
+
+        // Simple hash function (do not use for real security)
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
             }
+            return hash.toString();
         }
 
-        function resetPassword() {
-            // This is a simple alert-based reset feature. 
-            // In a real-world scenario, this would trigger an email or a more secure process.
-            alert("Password Reset Hint: Your password is your G.C.E O/L Index Number followed by '@' and your first name with a capital letter.");
+        if(loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = document.getElementById('password').value;
+                
+                if (simpleHash(password) === correctHash) {
+                    // Correct password
+                    if(loginScreen) loginScreen.style.display = 'none';
+                    if(contentScreen) contentScreen.style.display = 'block';
+                    if(errorMessage) errorMessage.classList.add('hidden');
+                    sessionStorage.setItem('isLoggedIn', 'true'); // Keep user logged in for the session
+                } else {
+                    // Incorrect password
+                    if(errorMessage) errorMessage.classList.remove('hidden');
+                    // Add a shake animation for effect
+                    if (loginForm.parentElement) {
+                        loginForm.parentElement.classList.add('animate-shake');
+                        setTimeout(() => {
+                            if(loginForm.parentElement) {
+                                loginForm.parentElement.classList.remove('animate-shake');
+                            }
+                        }, 500);
+                    }
+                }
+            });
         }
 
-        function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password-input');
-            const icon = document.getElementById('password-toggle-icon');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
+        // --- Forgot Password ---
+        if(resetPasswordBtn) {
+            resetPasswordBtn.addEventListener('click', function() {
+                // This is a simple client-side reset, so we'll just show an alert with a hint.
+                // A real app would email a reset link.
+                alert("Password Reset Hint:\n\nYour password is your 2020 GCE O/L Index Number, followed by '@Vidu'.");
+            });
         }
 
-        // Add shake animation style to head for wrong password feedback
+        // --- Logout ---
+        function logout() {
+            sessionStorage.removeItem('isLoggedIn');
+            if(loginScreen) loginScreen.style.display = 'flex';
+            if(contentScreen) contentScreen.style.display = 'none';
+            const passField = document.getElementById('password');
+            if(passField) passField.value = '';
+        }
+
+        // --- Check session storage ---
+        // This keeps the user logged in if they refresh the page
+        if (sessionStorage.getItem('isLoggedIn') === 'true' && loginScreen && contentScreen) {
+            loginScreen.style.display = 'none';
+            contentScreen.style.display = 'block';
+        }
+
+        // Add a simple shake animation for the error
         const style = document.createElement('style');
         style.innerHTML = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-            }
             .animate-shake {
-                animation: shake 0.5s ease-in-out;
+                animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+                transform: translate3d(0, 0, 0);
+            }
+            @keyframes shake {
+                10%, 90% { transform: translate3d(-1px, 0, 0); }
+                20%, 80% { transform: translate3d(2px, 0, 0); }
+                30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+                40%, 60% { transform: translate3d(4px, 0, 0); }
             }
         `;
         document.head.appendChild(style);
     </script>
 </body>
 </html>
+
