@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Year Countdown - Naween</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        body {
+            /* A more "lovely" deep rose and violet gradient */
+            background: radial-gradient(circle at center, #2d1b33 0%, #1a0b1c 50%, #05010a 100%);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            color: #fff;
+        }
+
+        .glass {
+            background: rgba(255, 182, 193, 0.07);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            border-radius: 2.5rem;
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255, 105, 180, 0.1);
+        }
+
+        .neon-text {
+            /* Rose gold / Pink neon glow */
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.8),
+                         0 0 20px rgba(255, 105, 180, 0.4),
+                         0 0 30px rgba(255, 20, 147, 0.2);
+        }
+
+        .countdown-item {
+            min-width: 80px;
+            position: relative;
+        }
+
+        .countdown-number {
+            background: linear-gradient(to bottom, #ffffff, #ffc0cb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .particle {
+            position: absolute;
+            bottom: -20px;
+            z-index: 0;
+            pointer-events: none;
+            animation: float linear forwards;
+        }
+
+        .brother-name {
+            font-family: 'Pacifico', cursive;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4, #ffecd2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 5px rgba(255, 154, 158, 0.5));
+        }
+
+        .heart {
+            fill: #ff69b4;
+            filter: drop-shadow(0 0 5px rgba(255, 105, 180, 0.8));
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <div id="particle-container"></div>
+
+    <div class="glass p-8 md:p-12 text-center z-10 max-w-2xl w-[90%] mx-auto border-t border-white/10">
+        <h2 class="text-xl md:text-2xl font-light tracking-[0.3em] uppercase mb-2 text-pink-200 opacity-80">Counting down to 2026</h2>
+        <h1 class="text-5xl md:text-7xl font-extrabold mb-6 neon-text tracking-tighter">Happy New Year</h1>
+        
+        <div class="text-3xl md:text-4xl mb-8">
+            To my lovely brother, <br class="md:hidden"> <span class="brother-name">Naween</span>
+        </div>
+
+        <div id="countdown" class="flex justify-center gap-4 md:gap-8 mb-10">
+            <div class="countdown-item">
+                <div id="days" class="text-4xl md:text-6xl countdown-number">00</div>
+                <div class="text-xs md:text-sm uppercase tracking-widest text-pink-300 opacity-70 mt-2">Days</div>
+            </div>
+            <div class="countdown-item">
+                <div id="hours" class="text-4xl md:text-6xl countdown-number">00</div>
+                <div class="text-xs md:text-sm uppercase tracking-widest text-pink-300 opacity-70 mt-2">Hours</div>
+            </div>
+            <div class="countdown-item">
+                <div id="minutes" class="text-4xl md:text-6xl countdown-number">00</div>
+                <div class="text-xs md:text-sm uppercase tracking-widest text-pink-300 opacity-70 mt-2">Mins</div>
+            </div>
+            <div class="countdown-item">
+                <div id="seconds" class="text-4xl md:text-6xl font-bold text-pink-400">00</div>
+                <div class="text-xs md:text-sm uppercase tracking-widest text-pink-300 opacity-70 mt-2">Secs</div>
+            </div>
+        </div>
+
+        <div class="w-16 h-1 bg-gradient-to-right from-transparent via-pink-400 to-transparent mx-auto mb-6 opacity-30"></div>
+
+        <p class="text-lg italic text-pink-100 opacity-80 max-w-md mx-auto leading-relaxed">
+            "May this year bring you as much joy as you bring to everyone around you. Stay amazing, brother!"
+        </p>
+    </div>
+
+    <script>
+        function updateCountdown() {
+            const nextYear = new Date().getFullYear() + 1;
+            const newYearTime = new Date(`January 01, ${nextYear} 00:00:00`).getTime();
+            const currentTime = new Date().getTime();
+            const diff = newYearTime - currentTime;
+
+            if (diff <= 0) {
+                document.getElementById('countdown').innerHTML = `
+                    <div class='text-4xl md:text-5xl font-bold animate-pulse text-pink-400'>
+                        HAPPY 2026 NAWEEN! 💖🎆
+                    </div>`;
+                return;
+            }
+
+            const d = Math.floor(diff / 1000 / 60 / 60 / 24);
+            const h = Math.floor(diff / 1000 / 60 / 60) % 24;
+            const m = Math.floor(diff / 1000 / 60) % 60;
+            const s = Math.floor(diff / 1000) % 60;
+
+            document.getElementById('days').innerText = d.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+        }
+
+        function createParticles() {
+            const container = document.getElementById('particle-container');
+            
+            setInterval(() => {
+                const isHeart = Math.random() > 0.7;
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 15 + 5;
+                const duration = Math.random() * 4 + 4;
+                
+                if (isHeart) {
+                    particle.innerHTML = `
+                        <svg class="heart" width="${size}" height="${size}" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>`;
+                } else {
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.borderRadius = '50%';
+                    particle.style.backgroundColor = ['#ff9a9e', '#fad0c4', '#ffecd2', '#fff'][Math.floor(Math.random() * 4)];
+                    particle.style.boxShadow = '0 0 10px white';
+                }
+                
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDuration = duration + 's';
+                
+                container.appendChild(particle);
+
+                setTimeout(() => {
+                    particle.remove();
+                }, duration * 1000);
+            }, 300);
+        }
+
+        window.onload = () => {
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+            createParticles();
+        };
+    </script>
+</body>
+</html>
