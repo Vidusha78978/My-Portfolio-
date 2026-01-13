@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gallery - ADHI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&family=Pacifico&family=Dancing+Script:wght@600&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-rose: #ff4d6d;
+            --glow: rgba(255, 77, 109, 0.5);
+        }
+
+        body {
+            background: #0a0104;
+            background-image: 
+                radial-gradient(circle at 20% 30%, #2b0610 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, #1a050d 0%, transparent 40%),
+                linear-gradient(135deg, #0a0104 0%, #1f040a 100%);
+            background-attachment: fixed;
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            animation: bg-shift 15s ease infinite alternate;
+        }
+
+        @keyframes bg-shift {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        .header-section {
+            text-align: center;
+            padding: 5rem 1rem 4rem 1rem;
+            position: relative;
+            z-index: 20;
+        }
+
+        .name-wrapper {
+            position: relative;
+            display: inline-block;
+            padding: 25px 70px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4), 
+                        inset 0 0 30px rgba(255, 77, 109, 0.15);
+        }
+
+        .crush-name {
+            font-family: 'Pacifico', cursive;
+            background: linear-gradient(45deg, #fff 10%, #ff85a1 50%, #fff 90%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 4.5rem;
+            filter: drop-shadow(0 0 20px var(--glow));
+            animation: shine 4s linear infinite;
+            letter-spacing: 2px;
+            line-height: 1.2;
+        }
+
+        .gallery-title {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.5rem;
+            color: #ffb3c1;
+            margin-top: -10px;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            opacity: 0.9;
+            text-shadow: 0 0 15px var(--glow);
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        .particle {
+            position: absolute;
+            bottom: -50px;
+            pointer-events: none;
+            z-index: 1;
+            animation: float-up linear forwards;
+            filter: blur(0.5px);
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(0) rotate(0deg) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-115vh) rotate(360deg) scale(1.2); opacity: 0; }
+        }
+
+        #enter-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 1s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .love-pulse { 
+            animation: heart-pulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px #ff4d6d);
+        }
+
+        @keyframes heart-pulse { 
+            0%, 100% { transform: scale(1); opacity: 0.8; } 
+            50% { transform: scale(1.2); opacity: 1; } 
+        }
+
+        .gallery-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media (min-width: 640px) {
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+            .crush-name { font-size: 6.5rem; }
+            .gallery-title { font-size: 2rem; letter-spacing: 12px; }
+        }
+
+        .gallery-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--primary-rose);
+            box-shadow: 0 15px 30px rgba(255, 77, 109, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: 0.5s ease;
+        }
+
+        #lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 0, 2, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #lightbox.active { display: flex; animation: fadeIn 0.4s ease; }
+
+        .load-more-btn {
+            display: block;
+            margin: 50px auto;
+            padding: 15px 45px;
+            background: transparent;
+            border: 2px solid var(--primary-rose);
+            border-radius: 100px;
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .load-more-btn:hover {
+            background: var(--primary-rose);
+            box-shadow: 0 0 30px var(--glow);
+            transform: scale(1.05);
+        }
+
+        .music-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            z-index: 500;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            cursor: pointer;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: flex-end;
+            padding: 20px 30px 40px 0;
+            opacity: 0.6;
+            position: relative;
+            z-index: 10;
+        }
+
+        .signature-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.1rem;
+            color: #ffb3c1;
+            letter-spacing: 1px;
+            display: inline-block;
+            position: relative;
+        }
+
+        .signature-text::before {
+            content: '— ';
+            color: var(--primary-rose);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="lightbox" onclick="closeLightbox()">
+        <img id="lightbox-img" class="max-w-full max-h-[85vh] rounded-xl shadow-2xl" src="" alt="Full View">
+        <div class="absolute bottom-10 text-pink-200 uppercase tracking-widest text-xs opacity-60">Tap to close</div>
+    </div>
+
+    <div id="enter-overlay" onclick="startExperience()">
+        <div class="love-pulse">
+            <svg fill="#ff4d6d" width="100" height="100" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <div class="mt-8 text-sm tracking-[0.5em] text-pink-200 uppercase animate-pulse">Touch her heart</div>
+    </div>
+
+    <div id="particle-container" class="fixed inset-0 pointer-events-none"></div>
+
+    <button id="musicToggle" class="music-btn" style="opacity:0">
+        <svg id="musicIcon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff4d6d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+    </button>
+    
+    <audio id="bgMusic" loop preload="auto">
+        <source src="back.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="gallery-container">
+        <header class="header-section">
+            <div class="name-wrapper">
+                <div class="crush-name">ADHI</div>
+            </div>
+            <div class="gallery-title">Gallery</div>
+        </header>
+
+        <main class="gallery-grid" id="gallery-grid">
+            <!-- Photos dynamically loaded -->
+        </main>
+
+        <button id="loadMore" class="load-more-btn">Discover More</button>
+
+        <div class="signature-section">
+            <div class="signature-text">Vidusha</div>
+        </div>
+    </div>
+
+    <script>
+        const totalImages = 60;
+        const batchSize = 30;
+        let currentlyShown = 0;
+        const photos = Array.from({ length: totalImages }, (_, i) => `${i + 1}.jpg`);
+
+        function renderBatch() {
+            const grid = document.getElementById('gallery-grid');
+            const loadMoreBtn = document.getElementById('loadMore');
+            const nextBatch = photos.slice(currentlyShown, currentlyShown + batchSize);
+            
+            nextBatch.forEach((url, i) => {
+                const item = document.createElement('div');
+                item.className = 'gallery-item';
+                
+                const placeholder = `https://via.placeholder.com/400x500/2b0610/ff4d6d?text=Moment+${currentlyShown + i + 1}`;
+                item.onclick = () => openLightbox(url, placeholder);
+                item.innerHTML = `<img src="${url}" loading="lazy" alt="Memory" onerror="this.src='${placeholder}'; this.onerror=null;">`;
+                grid.appendChild(item);
+            });
+
+            currentlyShown += nextBatch.length;
+            if (currentlyShown >= totalImages) loadMoreBtn.style.display = 'none';
+        }
+
+        document.getElementById('loadMore').addEventListener('click', renderBatch);
+
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+
+        function openLightbox(url, placeholder) {
+            lightboxImg.src = url;
+            lightboxImg.onerror = () => { lightboxImg.src = placeholder; };
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        const music = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicToggle');
+        const musicIcon = document.getElementById('musicIcon');
+        const overlay = document.getElementById('enter-overlay');
+        let isMusicPlaying = false;
+
+        async function startExperience() {
+            overlay.style.transform = 'translateY(-100%)';
+            setTimeout(() => { overlay.style.display = 'none'; }, 1000);
+            
+            try {
+                await music.play();
+                isMusicPlaying = true;
+                musicBtn.style.opacity = '1';
+                musicBtn.classList.add('animate-spin-slow');
+            } catch (err) {
+                console.log("Autoplay blocked. User needs manual trigger.");
+                musicBtn.style.opacity = '1';
+                updateMusicIcon(false);
+            }
+        }
+
+        musicBtn.onclick = async () => {
+            if (isMusicPlaying) {
+                music.pause();
+                isMusicPlaying = false;
+                musicBtn.classList.remove('animate-spin-slow');
+                updateMusicIcon(false);
+            } else {
+                try {
+                    await music.play();
+                    isMusicPlaying = true;
+                    musicBtn.classList.add('animate-spin-slow');
+                    updateMusicIcon(true);
+                } catch (err) {
+                    console.log("Play failed:", err);
+                }
+            }
+        };
+
+        function updateMusicIcon(playing) {
+            if (playing) {
+                musicIcon.innerHTML = '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>';
+            } else {
+                musicIcon.innerHTML = '<line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>';
+            }
+        }
+
+        function spawnHeart() {
+            const container = document.getElementById('particle-container');
+            if (container.children.length > 20) return;
+            
+            const heart = document.createElement('div');
+            heart.className = 'particle';
+            const size = Math.random() * 12 + 8;
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = (Math.random() * 4 + 6) + 's';
+            
+            const color = Math.random() > 0.5 ? '#ff4d6d' : '#ffb3c1';
+            heart.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${color}" style="opacity: ${Math.random() * 0.4 + 0.2}"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+            container.appendChild(heart);
+            setTimeout(() => { heart.remove(); }, 8000);
+        }
+
+        window.onload = () => {
+            renderBatch();
+            setInterval(spawnHeart, 700);
+        };
+    </script>
+</body>
+</html>
