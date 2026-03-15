@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Vidusha Chathuranga</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- International Telephone Input CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/css/intlTelInput.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Dark background matching your site */
+            color: #f1f5f9;
+        }
+
+        .iti {
+            width: 100%;
+        }
+
+        /* Dark mode input styling */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #334155;
+            background-color: #1e293b;
+            color: #f1f5f9;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: #64748b;
+        }
+
+        /* Custom dropdown arrow for dark mode */
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+        }
+
+        /* Phone input custom styling for dark mode */
+        .iti__country-list {
+            background-color: #1e293b !important;
+            border: 1px solid #334155 !important;
+            color: #f1f5f9 !important;
+        }
+        .iti__country:hover {
+            background-color: #334155 !important;
+        }
+
+        /* Custom Modal Styling */
+        #successModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-[#111827] border-b border-slate-800 p-4">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <a href="index.html" class="font-bold text-xl text-blue-500">Vidusha Chathuranga</a>
+            <a href="index.html" class="text-slate-400 hover:text-blue-400 transition">Back to Home</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex items-center justify-center p-6">
+        <div class="bg-[#111827] border border-slate-800 rounded-2xl shadow-2xl w-full max-w-2xl p-8 md:p-12">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-bold text-white mb-2">Get in Touch</h1>
+                <p class="text-slate-400">Have a project in mind? Let's build something amazing together.</p>
+            </div>
+
+            <form id="contactForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- First Name -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-1">First Name</label>
+                        <input type="text" id="fname" name="fname" required class="form-input" placeholder="John">
+                    </div>
+                    <!-- Last Name -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-1">Last Name</label>
+                        <input type="text" id="lname" name="lname" required class="form-input" placeholder="Doe">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-1">Email Address</label>
+                        <input type="email" id="email" name="email" required class="form-input" placeholder="john@example.com">
+                    </div>
+                    <!-- Contact Number -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-300 mb-1">Contact Number</label>
+                        <input type="tel" id="phone" name="phone" required class="form-input">
+                    </div>
+                </div>
+
+                <!-- Preferred Method -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-1">Preferred Contact Method</label>
+                    <select id="prefMethod" name="prefMethod" class="form-input">
+                        <option value="Both">Both (Email & WhatsApp)</option>
+                        <option value="Email">Email Only</option>
+                        <option value="WhatsApp">WhatsApp Only</option>
+                    </select>
+                </div>
+
+                <!-- Message -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-300 mb-1">Message</label>
+                    <textarea id="message" name="message" rows="4" required class="form-input resize-none" placeholder="Write your message here..."></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform active:scale-[0.98] flex items-center justify-center shadow-lg shadow-blue-900/20">
+                    <span id="btnText">Send Message</span>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Success Popup Modal -->
+    <div id="successModal">
+        <div class="bg-[#1e293b] border border-slate-700 p-8 rounded-xl shadow-2xl max-w-sm w-full mx-4 text-center">
+            <div class="w-16 h-16 bg-blue-900/30 text-blue-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-2">Success!</h2>
+            <p class="text-slate-400 mb-6">Your message has been sent!</p>
+            <p class="text-xs text-blue-400/60 uppercase tracking-widest font-semibold">Redirecting to home...</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/intlTelInput.min.js"></script>
+    <script>
+        // --- EmailJS Configuration ---
+        // Replace these with your actual IDs from EmailJS
+        const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY"; 
+        const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+        const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+
+        (function() {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+        })();
+
+        // Initialize International Phone Input
+        const phoneInput = document.querySelector("#phone");
+        const iti = window.intlTelInput(phoneInput, {
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+            initialCountry: "lk", 
+            separateDialCode: true,
+        });
+
+        const form = document.getElementById('contactForm');
+        const modal = document.getElementById('successModal');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // UI Feedback
+            submitBtn.disabled = true;
+            btnText.innerHTML = '<span class="loading-spinner"></span> Sending...';
+
+            // Collect Data
+            const fname = document.getElementById('fname').value;
+            const lname = document.getElementById('lname').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            const prefMethod = document.getElementById('prefMethod').value;
+            const fullPhone = iti.getNumber();
+
+            const targetWhatsApp = "+94760411245";
+
+            // Prepare Parameters for EmailJS
+            const templateParams = {
+                from_name: `${fname} ${lname}`,
+                from_email: email,
+                contact_number: fullPhone,
+                preferred_method: prefMethod,
+                message: message,
+                to_email: "vidushachathuranga78978@gmail.com"
+            };
+
+            // 1. Silent Email via EmailJS
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(function() {
+                    // 2. WhatsApp Redirection if needed
+                    if (prefMethod === "WhatsApp" || prefMethod === "Both") {
+                        const bodyText = `New Message from ${fname} ${lname}\nEmail: ${email}\nPhone: ${fullPhone}\nMethod: ${prefMethod}\n\nMessage:\n${message}`;
+                        const waUrl = `https://wa.me/${targetWhatsApp.replace('+', '')}?text=${encodeURIComponent(bodyText)}`;
+                        window.open(waUrl, '_blank');
+                    }
+
+                    // 3. Show Success Modal
+                    modal.style.display = 'flex';
+
+                    // 4. Redirect
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 3000);
+
+                }, function(error) {
+                    console.error('FAILED...', error);
+                    alert("Submission failed. Please check your EmailJS credentials or internet connection.");
+                    submitBtn.disabled = false;
+                    btnText.innerHTML = 'Send Message';
+                });
+        });
+    </script>
+</body>
+</html>
