@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support & Donations | Vidusha Chathuranga</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/dist/css/all.min.css">
+    <style>
+        /* Modern theme colors based on professional dark/blue aesthetics */
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .glass-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+        }
+
+        .copy-feedback {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            padding: 10px 20px;
+            border-radius: 50px;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .qr-container {
+            transition: transform 0.3s ease;
+        }
+
+        .qr-container:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Header Section -->
+    <header class="text-center mb-10 max-w-2xl">
+        <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Support My Work</h1>
+        <p class="text-slate-400 text-lg">Your support helps me continue developing projects and creating content. Thank you for your generosity!</p>
+    </header>
+
+    <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <!-- Payment Details Card -->
+        <div class="glass-card p-8 flex flex-col">
+            <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                <i class="fas fa-university mr-3 text-blue-400"></i> Bank Transfer
+            </h2>
+            
+            <div class="space-y-6">
+                <!-- Account Name -->
+                <div class="relative group">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Account Name</label>
+                    <div class="flex items-center justify-between bg-slate-900/50 p-3 rounded-lg mt-1 border border-slate-700/50">
+                        <span id="acc-name" class="font-medium">N.G.V.C Chandrasena</span>
+                        <button onclick="copyText('acc-name')" class="text-blue-400 hover:text-blue-300 transition-colors">
+                            <i class="far fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Account Number -->
+                <div class="relative group">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Account Number</label>
+                    <div class="flex items-center justify-between bg-slate-900/50 p-3 rounded-lg mt-1 border border-slate-700/50">
+                        <span id="acc-num" class="font-medium tracking-wider text-lg">115511732858</span>
+                        <button onclick="copyText('acc-num')" class="text-blue-400 hover:text-blue-300 transition-colors">
+                            <i class="far fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bank Name -->
+                <div class="relative group">
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Bank & Branch</label>
+                    <div class="bg-slate-900/50 p-3 rounded-lg mt-1 border border-slate-700/50">
+                        <p class="font-medium">NDB Bank</p>
+                        <p class="text-sm text-slate-400">Gampola Branch</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto pt-8">
+                <p class="text-xs text-slate-500 italic">* Please send a screenshot of the transaction to my email or WhatsApp after completion.</p>
+            </div>
+        </div>
+
+        <!-- QR Code Card -->
+        <div class="glass-card p-8 text-center flex flex-col items-center">
+            <h2 class="text-2xl font-semibold mb-6 flex items-center self-start">
+                <i class="fas fa-qrcode mr-3 text-blue-400"></i> Scan to Pay
+            </h2>
+            
+            <div class="qr-container bg-white p-4 rounded-2xl mb-6 inline-block">
+                <!-- Direct link to your Google Drive QR code -->
+                <img src="https://lh3.googleusercontent.com/d/1liFh_VJy0uMAbuUmaPPO0W4kAYOLX8Ei" alt="Payment QR Code" class="w-64 h-64 rounded-lg object-contain">
+            </div>
+
+            <p class="text-slate-400 mb-6">Supports all LANKAQR compatible banking apps (NDB Neos, Flash, Frimi, iPay, etc.)</p>
+            
+            <div class="w-full space-y-3">
+                <a href="mailto:vidushachathuranga78978@gmail.com" class="block w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-500/20">
+                    <i class="far fa-envelope mr-2"></i> Notify via Email
+                </a>
+                <a href="https://wa.me/+94760411245" target="_blank" class="block w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-500/20">
+                    <i class="fab fa-whatsapp mr-2"></i> Notify via WhatsApp
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer / Navigation Back -->
+    <footer class="mt-12 text-center">
+        <a href="index.html" class="text-slate-400 hover:text-white transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Home
+        </a>
+    </footer>
+
+    <!-- Copy Success Notification -->
+    <div id="copy-toast" class="copy-feedback">
+        <i class="fas fa-check-circle mr-2"></i> Copied to clipboard!
+    </div>
+
+    <script>
+        function copyText(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            const tempInput = document.createElement("input");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // Show toast
+            const toast = document.getElementById('copy-toast');
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
