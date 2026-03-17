@@ -1,634 +1,197 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { initializeApp } from 'firebase/app';
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  onSnapshot 
-} from 'firebase/firestore';
-import { 
-  getAuth, 
-  signInWithCustomToken, 
-  signInAnonymously, 
-  onAuthStateChanged 
-} from 'firebase/auth';
-import { 
-  Book, 
-  Plus, 
-  Trash2, 
-  Edit2, 
-  Calendar, 
-  User, 
-  Star, 
-  Clock, 
-  Search, 
-  Save, 
-  X,
-  GraduationCap,
-  Layout,
-  CheckCircle2,
-  Circle,
-  ListTodo,
-  TrendingUp,
-  Cloud,
-  CloudRain,
-  Copy,
-  LogIn,
-  LogOut,
-  ShieldCheck
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vidusha's Cloud Diary</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { h, render, Component } from 'https://esm.sh/preact';
+        import { useState, useEffect, useMemo } from 'https://esm.sh/preact/hooks';
 
-// Firebase Configuration from Environment
-const firebaseConfig = JSON.parse(__firebase_config);
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'diary-app-vidusha';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
 
-const App = () => {
-  // Auth & Session State
-  const [user, setUser] = useState(null);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [loginIdInput, setLoginIdInput] = useState('');
-  const [showLoginScreen, setShowLoginScreen] = useState(false);
-  
-  // App State
-  const [activeTab, setActiveTab] = useState('daily');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [entries, setEntries] = useState([]);
-  const [vaultItems, setVaultItems] = useState([]);
-  const [tasks, setTasks] = useState([]);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : "diary-app-v1";
 
-  // UI States
-  const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
-  const [isVaultModalOpen, setIsVaultModalOpen] = useState(false);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
-  const [copyFeedback, setCopyFeedback] = useState(false);
+        function App() {
+            const [user, setUser] = useState(null);
+            const [activeTab, setActiveTab] = useState('daily');
+            const [entries, setEntries] = useState([]);
+            const [tasks, setTasks] = useState([]);
+            const [vault, setVault] = useState([]);
+            const [showLogin, setShowLogin] = useState(false);
+            const [loginId, setLoginId] = useState('');
 
-  // Form States
-  const [entryForm, setEntryForm] = useState({ title: '', content: '', type: 'Work', date: new Date().toISOString().split('T')[0] });
-  const [vaultForm, setVaultForm] = useState({ name: '', details: '', category: 'Event', date: '' });
-  const [taskForm, setTaskForm] = useState({ text: '', priority: 'Medium', completed: false });
+            useEffect(() => {
+                const initAuth = async () => {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (e) { console.error(e); }
+                };
+                initAuth();
+                const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
+                return () => unsubscribe();
+            }, []);
 
-  // 1. Initialize Authentication (RULE 3)
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        // Check if we have a saved manual ID in local storage for persistence across refreshes
-        const savedId = localStorage.getItem('diary_manual_uid');
-        
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          // If no manual session, sign in anonymously
-          await signInAnonymously(auth);
+            useEffect(() => {
+                if (!user) return;
+                const uid = localStorage.getItem('diary_uid') || user.uid;
+
+                const unsubEntries = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'entries'), (s) => setEntries(s.data()?.list || []));
+                const unsubTasks = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'tasks'), (s) => setTasks(s.data()?.list || []));
+                const unsubVault = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'vault'), (s) => setVault(s.data()?.list || []));
+
+                return () => { unsubEntries(); unsubTasks(); unsubVault(); };
+            }, [user]);
+
+            const persist = async (key, list) => {
+                if (!user) return;
+                const uid = localStorage.getItem('diary_uid') || user.uid;
+                await setDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', key), { list });
+            };
+
+            const addItem = (type) => {
+                const title = prompt(`Enter ${type === 'vault' ? 'name' : 'title'}:`);
+                if (!title) return;
+                
+                if (type === 'entry') {
+                    const content = prompt("Enter description:");
+                    const newList = [{ id: Date.now(), title, content, date: new Date().toLocaleDateString() }, ...entries];
+                    setEntries(newList); persist('entries', newList);
+                } else if (type === 'task') {
+                    const newList = [{ id: Date.now(), text: title, completed: false }, ...tasks];
+                    setTasks(newList); persist('tasks', newList);
+                } else if (type === 'vault') {
+                    const category = prompt("Category (Person/Event/Thing):", "Person");
+                    const details = prompt("Details/Notes:");
+                    const newList = [{ id: Date.now(), name: title, category, details, date: new Date().toLocaleDateString() }, ...vault];
+                    setVault(newList); persist('vault', newList);
+                }
+            };
+
+            const toggleTask = (id) => {
+                const newList = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+                setTasks(newList); persist('tasks', newList);
+            };
+
+            const deleteItem = (key, id) => {
+                if (!confirm("Delete this item?")) return;
+                let newList;
+                if (key === 'entries') { newList = entries.filter(e => e.id !== id); setEntries(newList); }
+                else if (key === 'tasks') { newList = tasks.filter(t => t.id !== id); setTasks(newList); }
+                else { newList = vault.filter(v => v.id !== id); setVault(newList); }
+                persist(key, newList);
+            };
+
+            const handleSync = (e) => {
+                e.preventDefault();
+                localStorage.setItem('diary_uid', loginId.trim());
+                window.location.reload();
+            };
+
+            const currentId = localStorage.getItem('diary_uid') || (user ? user.uid : '...');
+
+            return h('div', { class: 'min-h-screen bg-slate-50 flex font-sans text-slate-900' }, [
+                // Sidebar
+                h('nav', { class: 'w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 shadow-sm' }, [
+                    h('div', { class: 'p-6 font-bold text-xl hidden md:block text-indigo-600' }, "Cloud Diary"),
+                    h('div', { class: 'flex-1 p-4 space-y-2' }, [
+                        h('button', { onClick: () => setActiveTab('daily'), class: `w-full p-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === 'daily' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-400 hover:bg-slate-100'}` }, [
+                            h('i', { 'data-lucide': 'book', class: 'w-5 h-5' }), h('span', { class: 'hidden md:inline font-semibold' }, "Daily Logs")
+                        ]),
+                        h('button', { onClick: () => setActiveTab('tasks'), class: `w-full p-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === 'tasks' ? 'bg-emerald-50 text-emerald-600' : 'text-slate-400 hover:bg-slate-100'}` }, [
+                            h('i', { 'data-lucide': 'check-circle', class: 'w-5 h-5' }), h('span', { class: 'hidden md:inline font-semibold' }, "Tasks")
+                        ]),
+                        h('button', { onClick: () => setActiveTab('vault'), class: `w-full p-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === 'vault' ? 'bg-purple-50 text-purple-600' : 'text-slate-400 hover:bg-slate-100'}` }, [
+                            h('i', { 'data-lucide': 'star', class: 'w-5 h-5' }), h('span', { class: 'hidden md:inline font-semibold' }, "Special Vault")
+                        ])
+                    ]),
+                    h('div', { class: 'p-4 border-t' }, [
+                        h('button', { onClick: () => setShowLogin(true), class: 'w-full text-left p-2 bg-slate-50 rounded-lg text-[10px] font-mono truncate text-slate-400 hover:text-indigo-600' }, currentId)
+                    ])
+                ]),
+
+                // Main Content
+                h('main', { class: 'flex-1 p-6 md:p-12 max-w-6xl' }, [
+                    h('header', { class: 'flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8' }, [
+                        h('div', {}, [
+                            h('h1', { class: 'text-3xl font-black text-slate-800' }, 
+                                activeTab === 'daily' ? 'Stories & Logs' : activeTab === 'tasks' ? 'Daily Goals' : 'Special Vault'),
+                            h('p', { class: 'text-slate-400 text-sm' }, `Keep track of your most important ${activeTab === 'vault' ? 'people and memories' : 'daily updates'}.`)
+                        ]),
+                        h('button', { onClick: () => addItem(activeTab === 'daily' ? 'entry' : activeTab === 'tasks' ? 'task' : 'vault'), class: 'bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-indigo-700 transition active:scale-95' }, "+ Add New")
+                    ]),
+
+                    activeTab === 'daily' && h('div', { class: 'grid gap-4' }, entries.map(e => 
+                        h('div', { class: 'bg-white p-6 rounded-2xl shadow-sm border border-slate-100 group relative' }, [
+                            h('div', { class: 'text-[10px] font-black text-slate-300 uppercase mb-1' }, e.date),
+                            h('h3', { class: 'text-xl font-bold mb-2 text-slate-800' }, e.title),
+                            h('p', { class: 'text-slate-500 leading-relaxed' }, e.content),
+                            h('button', { onClick: () => deleteItem('entries', e.id), class: 'absolute top-6 right-6 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
+                        ])
+                    )),
+
+                    activeTab === 'tasks' && h('div', { class: 'bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden' }, tasks.map(t => 
+                        h('div', { class: 'flex items-center gap-4 p-5 border-b last:border-0 hover:bg-slate-50 transition-colors' }, [
+                            h('input', { type: 'checkbox', checked: t.completed, onChange: () => toggleTask(t.id), class: 'w-6 h-6 rounded-full border-slate-200 text-indigo-600' }),
+                            h('span', { class: `flex-1 font-bold ${t.completed ? 'line-through text-slate-300' : 'text-slate-700'}` }, t.text),
+                            h('button', { onClick: () => deleteItem('tasks', t.id), class: 'text-slate-200 hover:text-red-400' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
+                        ])
+                    )),
+
+                    activeTab === 'vault' && h('div', { class: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' }, vault.map(v => 
+                        h('div', { class: 'bg-white rounded-3xl p-6 shadow-sm border border-slate-100 group relative hover:shadow-md transition-all' }, [
+                            h('div', { class: 'flex items-center justify-between mb-4' }, [
+                                h('span', { class: `text-[10px] font-black px-3 py-1 rounded-full uppercase ${v.category === 'Person' ? 'bg-purple-100 text-purple-600' : 'bg-orange-100 text-orange-600'}` }, v.category),
+                                h('button', { onClick: () => deleteItem('vault', v.id), class: 'opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
+                            ]),
+                            h('h3', { class: 'text-lg font-bold text-slate-800 mb-1' }, v.name),
+                            h('p', { class: 'text-xs text-slate-400 mb-4' }, v.date),
+                            h('p', { class: 'text-sm text-slate-500 leading-relaxed italic' }, v.details)
+                        ])
+                    )),
+
+                    // Sync Modal
+                    showLogin && h('div', { class: 'fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50' }, [
+                        h('div', { class: 'bg-white p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl' }, [
+                            h('h2', { class: 'text-2xl font-black mb-2 text-slate-800 text-center' }, "Sync Account"),
+                            h('p', { class: 'text-slate-400 mb-6 text-sm text-center' }, "Paste your Cloud ID to load your data on this device."),
+                            h('form', { onSubmit: handleSync, class: 'space-y-4' }, [
+                                h('input', { class: 'w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-mono text-xs focus:ring-2 focus:ring-indigo-500', placeholder: 'Cloud ID...', value: loginId, onInput: (e) => setLoginId(e.target.value) }),
+                                h('button', { class: 'w-full bg-indigo-600 text-white p-4 rounded-2xl font-black shadow-lg shadow-indigo-100' }, "Sync Now"),
+                                h('button', { type: 'button', onClick: () => { localStorage.removeItem('diary_uid'); window.location.reload(); }, class: 'w-full text-[10px] text-red-400 font-bold uppercase' }, "Disconnect / Reset"),
+                                h('button', { type: 'button', onClick: () => setShowLogin(false), class: 'w-full text-slate-300 font-bold text-sm' }, "Cancel")
+                            ])
+                        ])
+                    ])
+                ])
+            ]);
         }
-      } catch (error) {
-        console.error("Auth failed", error);
-      }
-    };
-    initAuth();
-    const unsubscribe = onAuthStateChanged(auth, setUser);
-    return () => unsubscribe();
-  }, []);
 
-  // 2. Real-time Data Sync (RULE 1 & 2)
-  useEffect(() => {
-    if (!user) return;
-
-    // Use a manual UID override if stored, otherwise use the auth UID
-    const targetUid = localStorage.getItem('diary_manual_uid') || user.uid;
-
-    const entriesRef = doc(db, 'artifacts', appId, 'users', targetUid, 'settings', 'entries');
-    const unsubEntries = onSnapshot(entriesRef, (docSnap) => {
-      if (docSnap.exists()) setEntries(docSnap.data().list || []);
-      else setEntries([]);
-    }, (err) => console.error("Entries sync error", err));
-
-    const vaultRef = doc(db, 'artifacts', appId, 'users', targetUid, 'settings', 'vault');
-    const unsubVault = onSnapshot(vaultRef, (docSnap) => {
-      if (docSnap.exists()) setVaultItems(docSnap.data().list || []);
-      else setVaultItems([]);
-    }, (err) => console.error("Vault sync error", err));
-
-    const tasksRef = doc(db, 'artifacts', appId, 'users', targetUid, 'settings', 'tasks');
-    const unsubTasks = onSnapshot(tasksRef, (docSnap) => {
-      if (docSnap.exists()) setTasks(docSnap.data().list || []);
-      else setTasks([]);
-    }, (err) => console.error("Tasks sync error", err));
-
-    return () => {
-      unsubEntries();
-      unsubVault();
-      unsubTasks();
-    };
-  }, [user]);
-
-  // Cloud Persistence Helpers
-  const persistData = async (collectionName, newList) => {
-    if (!user) return;
-    const targetUid = localStorage.getItem('diary_manual_uid') || user.uid;
-    try {
-      const docRef = doc(db, 'artifacts', appId, 'users', targetUid, 'settings', collectionName);
-      await setDoc(docRef, { list: newList });
-    } catch (error) {
-      console.error(`Error saving ${collectionName}:`, error);
-    }
-  };
-
-  // Login / Sync Handlers
-  const handleManualLogin = (e) => {
-    e.preventDefault();
-    if (!loginIdInput.trim()) return;
-    
-    setIsLoggingIn(true);
-    // Simulate a brief connection delay for UI feel
-    setTimeout(() => {
-      localStorage.setItem('diary_manual_uid', loginIdInput.trim());
-      // Refresh user state to trigger new listeners
-      const currentUser = auth.currentUser;
-      setUser(null);
-      setTimeout(() => setUser(currentUser), 10);
-      
-      setIsLoggingIn(false);
-      setShowLoginScreen(false);
-      setLoginIdInput('');
-    }, 800);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('diary_manual_uid');
-    window.location.reload(); // Hard reset for clean state
-  };
-
-  const copyIdToClipboard = () => {
-    const id = localStorage.getItem('diary_manual_uid') || user?.uid;
-    if (!id) return;
-    
-    const textField = document.createElement('textarea');
-    textField.innerText = id;
-    document.body.appendChild(textField);
-    textField.select();
-    document.execCommand('copy');
-    textField.remove();
-    
-    setCopyFeedback(true);
-    setTimeout(() => setCopyFeedback(false), 2000);
-  };
-
-  // Handlers for Data Items
-  const saveEntry = async (e) => {
-    e.preventDefault();
-    let updated = editingItem 
-      ? entries.map(item => item.id === editingItem.id ? { ...entryForm, id: item.id } : item)
-      : [{ ...entryForm, id: Date.now() }, ...entries];
-    setEntries(updated);
-    await persistData('entries', updated);
-    closeModals();
-  };
-
-  const saveVaultItem = async (e) => {
-    e.preventDefault();
-    let updated = editingItem 
-      ? vaultItems.map(item => item.id === editingItem.id ? { ...vaultForm, id: item.id } : item)
-      : [{ ...vaultForm, id: Date.now() }, ...vaultItems];
-    setVaultItems(updated);
-    await persistData('vault', updated);
-    closeModals();
-  };
-
-  const saveTask = async (e) => {
-    e.preventDefault();
-    let updated = editingItem 
-      ? tasks.map(t => t.id === editingItem.id ? { ...taskForm, id: t.id } : t)
-      : [{ ...taskForm, id: Date.now() }, ...tasks];
-    setTasks(updated);
-    await persistData('tasks', updated);
-    closeModals();
-  };
-
-  const toggleTask = async (id) => {
-    const updated = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-    setTasks(updated);
-    await persistData('tasks', updated);
-  };
-
-  const deleteTask = async (id, type) => {
-    if (!window.confirm(`Delete this ${type}?`)) return;
-    let updated;
-    if (type === 'entry') {
-      updated = entries.filter(e => e.id !== id);
-      setEntries(updated);
-      await persistData('entries', updated);
-    } else if (type === 'vault') {
-      updated = vaultItems.filter(v => v.id !== id);
-      setVaultItems(updated);
-      await persistData('vault', updated);
-    } else {
-      updated = tasks.filter(t => t.id !== id);
-      setTasks(updated);
-      await persistData('tasks', updated);
-    }
-  };
-
-  const closeModals = () => {
-    setIsEntryModalOpen(false);
-    setIsVaultModalOpen(false);
-    setIsTaskModalOpen(false);
-    setEditingItem(null);
-    setEntryForm({ title: '', content: '', type: 'Work', date: new Date().toISOString().split('T')[0] });
-    setVaultForm({ name: '', details: '', category: 'Event', date: '' });
-    setTaskForm({ text: '', priority: 'Medium', completed: false });
-  };
-
-  const openEditEntry = (entry) => { setEditingItem(entry); setEntryForm(entry); setIsEntryModalOpen(true); };
-  const openEditVault = (item) => { setEditingItem(item); setVaultForm(item); setIsVaultModalOpen(true); };
-  const openEditTask = (task) => { setEditingItem(task); setTaskForm(task); setIsTaskModalOpen(true); };
-
-  const filteredEntries = entries.filter(e => e.title.toLowerCase().includes(searchQuery.toLowerCase()) || e.content.toLowerCase().includes(searchQuery.toLowerCase()));
-  const filteredVault = vaultItems.filter(v => v.name.toLowerCase().includes(searchQuery.toLowerCase()) || v.details.toLowerCase().includes(searchQuery.toLowerCase()));
-  const filteredTasks = tasks.filter(t => t.text.toLowerCase().includes(searchQuery.toLowerCase()));
-
-  const taskStats = useMemo(() => {
-    const total = tasks.length;
-    const completed = tasks.filter(t => t.completed).length;
-    const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
-    return { total, completed, percent };
-  }, [tasks]);
-
-  const currentDisplayUid = localStorage.getItem('diary_manual_uid') || user?.uid;
-
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
-      {/* Navigation Sidebar */}
-      <nav className="fixed left-0 top-0 h-full w-20 md:w-64 bg-white border-r border-slate-200 z-10 flex flex-col">
-        <div className="p-6 border-b border-slate-100 flex items-center gap-3">
-          <div className="bg-blue-600 p-2 rounded-lg text-white">
-            <Book size={24} />
-          </div>
-          <span className="hidden md:block font-bold text-xl tracking-tight text-slate-800">Vidusha's Diary</span>
-        </div>
-        
-        <div className="flex-1 py-4 px-3 space-y-1">
-          <button 
-            onClick={() => setActiveTab('daily')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'daily' ? 'bg-blue-50 text-blue-600 shadow-sm' : 'text-slate-500 hover:bg-slate-100'}`}
-          >
-            <Clock size={20} />
-            <span className="hidden md:block font-medium text-sm">Daily Log</span>
-          </button>
-          
-          <button 
-            onClick={() => setActiveTab('tasks')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'tasks' ? 'bg-emerald-50 text-emerald-600 shadow-sm' : 'text-slate-500 hover:bg-slate-100'}`}
-          >
-            <ListTodo size={20} />
-            <span className="hidden md:block font-medium text-sm">To-Do List</span>
-          </button>
-
-          <button 
-            onClick={() => setActiveTab('vault')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === 'vault' ? 'bg-purple-50 text-purple-600 shadow-sm' : 'text-slate-500 hover:bg-slate-100'}`}
-          >
-            <Star size={20} />
-            <span className="hidden md:block font-medium text-sm">Special Vault</span>
-          </button>
-        </div>
-
-        <div className="p-4 border-t border-slate-100 space-y-4">
-           {/* Progress Widget */}
-           <div className="bg-slate-900 rounded-2xl p-4 text-white hidden md:block">
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Task Progress</p>
-                <TrendingUp size={14} className="text-emerald-400" />
-              </div>
-              <p className="text-lg font-bold mb-2">{taskStats.percent}% Done</p>
-              <div className="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                <div className="bg-emerald-400 h-full transition-all duration-500" style={{ width: `${taskStats.percent}%` }}></div>
-              </div>
-           </div>
-
-           {/* User ID & Sync Widget */}
-           <div className="px-2 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className={`flex items-center gap-2 ${user ? 'text-emerald-600' : 'text-slate-400'}`}>
-                  {user ? <Cloud size={16} /> : <CloudRain size={16} />}
-                  <span className="text-[10px] font-bold uppercase tracking-tight">{user ? 'Cloud Synced' : 'Syncing...'}</span>
-                </div>
-                <button 
-                  onClick={() => setShowLoginScreen(true)}
-                  className="p-1.5 bg-slate-100 text-slate-500 hover:text-blue-600 rounded-lg transition-colors md:block hidden"
-                  title="Switch User ID"
-                >
-                  <LogIn size={14} />
-                </button>
-              </div>
-
-              {user && (
-                <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl relative group">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">Your ID</span>
-                    <button 
-                      onClick={copyIdToClipboard}
-                      className="text-slate-400 hover:text-blue-600 transition-colors"
-                    >
-                      {copyFeedback ? <ShieldCheck size={12} className="text-emerald-500" /> : <Copy size={12} />}
-                    </button>
-                  </div>
-                  <span className="text-[10px] text-slate-600 font-mono block break-all leading-tight pr-4">
-                    {currentDisplayUid}
-                  </span>
-                  {localStorage.getItem('diary_manual_uid') && (
-                    <button 
-                      onClick={handleLogout}
-                      className="mt-2 w-full text-[9px] font-bold text-red-500 flex items-center justify-center gap-1 py-1 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
-                    >
-                      <LogOut size={10} /> Disconnect
-                    </button>
-                  )}
-                </div>
-              )}
-           </div>
-        </div>
-      </nav>
-
-      {/* Main Content Area */}
-      <main className="ml-20 md:ml-64 p-4 md:p-8">
-        <header className="max-w-5xl mx-auto mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900">
-              {activeTab === 'daily' && 'Personal Activities'}
-              {activeTab === 'tasks' && 'Daily Tasks & Goals'}
-              {activeTab === 'vault' && 'Special Events & People'}
-            </h1>
-            <p className="text-slate-500 font-medium">Manage your private cloud-synced life dashboard.</p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-full focus:ring-2 focus:ring-blue-500 outline-none w-48 md:w-64 transition-all"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <button 
-              onClick={() => {
-                if(activeTab === 'daily') setIsEntryModalOpen(true);
-                else if(activeTab === 'tasks') setIsTaskModalOpen(true);
-                else setIsVaultModalOpen(true);
-              }}
-              className={`${activeTab === 'tasks' ? 'bg-emerald-600 hover:bg-emerald-700' : activeTab === 'vault' ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'} text-white p-2 md:px-5 md:py-2.5 rounded-full flex items-center gap-2 transition-all shadow-md active:scale-95`}
-            >
-              <Plus size={20} />
-              <span className="hidden md:block font-semibold">Add New</span>
-            </button>
-          </div>
-        </header>
-
-        <div className="max-w-5xl mx-auto">
-          {/* Daily Tab Content */}
-          {activeTab === 'daily' && (
-            <div className="grid gap-4">
-              {filteredEntries.length === 0 ? <EmptyState icon={<Layout size={48}/>} text="No entries yet." /> : (
-                filteredEntries.map(entry => (
-                  <div key={entry.id} className="group bg-white p-6 rounded-2xl border border-slate-200 hover:shadow-lg hover:border-blue-200 transition-all">
-                    <div className="flex items-start justify-between">
-                      <div className="flex gap-4">
-                        <div className={`mt-1 p-2 rounded-xl ${entry.type === 'Study' ? 'bg-emerald-100 text-emerald-600' : entry.type === 'Special' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
-                          {entry.type === 'Study' ? <GraduationCap size={20} /> : <Calendar size={20} />}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">{entry.date}</span>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${entry.type === 'Study' ? 'bg-emerald-50 text-emerald-600' : entry.type === 'Special' ? 'bg-amber-50 text-amber-600' : 'bg-blue-50 text-blue-600'}`}>
-                              {entry.type}
-                            </span>
-                          </div>
-                          <h3 className="text-xl font-bold text-slate-800 mb-2">{entry.title}</h3>
-                          <p className="text-slate-600 whitespace-pre-wrap leading-relaxed">{entry.content}</p>
-                        </div>
-                      </div>
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openEditEntry(entry)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl"><Edit2 size={18} /></button>
-                        <button onClick={() => deleteTask(entry.id, 'entry')} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl"><Trash2 size={18} /></button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-
-          {/* Tasks Tab Content */}
-          {activeTab === 'tasks' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <StatCard label="To-Do" val={tasks.filter(t => !t.completed).length} color="text-orange-500" />
-                <StatCard label="Completed" val={tasks.filter(t => t.completed).length} color="text-emerald-500" />
-                <StatCard label="Progress" val={`${taskStats.percent}%`} color="text-blue-500" />
-              </div>
-              {filteredTasks.length === 0 ? <EmptyState icon={<ListTodo size={48}/>} text="All clear!" /> : (
-                <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
-                  {filteredTasks.map((task) => (
-                    <div key={task.id} className={`flex items-center gap-4 px-6 py-5 border-b border-slate-50 last:border-0 group hover:bg-slate-50/50 transition-all ${task.completed ? 'bg-slate-50/30' : ''}`}>
-                      <button onClick={() => toggleTask(task.id)} className={`transition-all transform active:scale-90 ${task.completed ? 'text-emerald-500' : 'text-slate-300 hover:text-emerald-500'}`}>
-                        {task.completed ? <CheckCircle2 size={26} /> : <Circle size={26} />}
-                      </button>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <p className={`font-semibold text-slate-800 ${task.completed ? 'line-through text-slate-400' : ''}`}>{task.text}</p>
-                          <PriorityBadge priority={task.priority} />
-                        </div>
-                      </div>
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openEditTask(task)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl"><Edit2 size={18} /></button>
-                        <button onClick={() => deleteTask(task.id, 'task')} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl"><Trash2 size={18} /></button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Vault Tab Content */}
-          {activeTab === 'vault' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredVault.length === 0 ? <div className="col-span-full"><EmptyState icon={<Star size={48}/>} text="Vault is empty." /></div> : (
-                filteredVault.map(item => (
-                  <div key={item.id} className="group bg-white rounded-3xl border border-slate-200 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div className={`h-2 ${item.category === 'Person' ? 'bg-purple-500' : item.category === 'Event' ? 'bg-orange-500' : 'bg-blue-500'}`}></div>
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className={`p-3 rounded-2xl ${item.category === 'Person' ? 'bg-purple-50 text-purple-600' : 'bg-orange-50 text-orange-600'}`}>
-                          {item.category === 'Person' ? <User size={22} /> : <Calendar size={22} />}
-                        </div>
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openEditVault(item)} className="p-2 text-slate-400 hover:text-blue-600 rounded-xl bg-slate-50"><Edit2 size={16} /></button>
-                          <button onClick={() => deleteTask(item.id, 'vault')} className="p-2 text-slate-400 hover:text-red-600 rounded-xl bg-slate-50"><Trash2 size={16} /></button>
-                        </div>
-                      </div>
-                      <h3 className="font-bold text-xl text-slate-800 mb-1">{item.name}</h3>
-                      <p className="text-[10px] text-slate-400 mb-4 font-black uppercase tracking-widest">{item.category} • {item.date || 'TBC'}</p>
-                      <p className="text-slate-600 text-sm line-clamp-4 leading-relaxed">{item.details}</p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-        </div>
-      </main>
-
-      {/* Sync / Login Modal */}
-      {showLoginScreen && (
-        <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-lg z-[100] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div className="p-10">
-              <div className="bg-blue-50 w-16 h-16 rounded-2xl flex items-center justify-center text-blue-600 mb-6 mx-auto">
-                <LogIn size={32} />
-              </div>
-              <h2 className="text-2xl font-black text-center text-slate-800 mb-2">Sync Account</h2>
-              <p className="text-center text-slate-500 mb-8 font-medium">Enter your unique User ID to sync your diary across multiple devices.</p>
-              
-              <form onSubmit={handleManualLogin} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-1">Unique User ID</label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="Paste ID here..."
-                    className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-mono text-sm"
-                    value={loginIdInput}
-                    onChange={(e) => setLoginIdInput(e.target.value)}
-                  />
-                </div>
-                <button 
-                  disabled={isLoggingIn}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-blue-200 active:scale-[0.98] flex items-center justify-center gap-2"
-                >
-                  {isLoggingIn ? (
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  ) : (
-                    <>Connect Cloud <Save size={20} /></>
-                  )}
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => setShowLoginScreen(false)}
-                  className="w-full text-slate-400 font-bold py-2 text-sm hover:text-slate-600 transition-colors"
-                >
-                  Cancel
-                </button>
-              </form>
-            </div>
-            <div className="p-6 bg-slate-50 text-center border-t border-slate-100">
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Privacy Note</p>
-              <p className="text-[10px] text-slate-400 leading-tight mt-1">Data is stored securely in your private cloud partition. Your ID is your key.</p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Form Modals (Simplified Logic for brevity) */}
-      <EntryModal isOpen={isEntryModalOpen} close={closeModals} form={entryForm} setForm={setEntryForm} save={saveEntry} editing={!!editingItem} />
-      <TaskModal isOpen={isTaskModalOpen} close={closeModals} form={taskForm} setForm={setTaskForm} save={saveTask} editing={!!editingItem} />
-      <VaultModal isOpen={isVaultModalOpen} close={closeModals} form={vaultForm} setForm={setVaultForm} save={saveVaultItem} editing={!!editingItem} />
-    </div>
-  );
-};
-
-// Sub-components for cleaner code
-const StatCard = ({ label, val, color }) => (
-  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm hover:border-blue-100 transition-colors">
-    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-    <p className={`text-3xl font-black ${color}`}>{val}</p>
-  </div>
-);
-
-const PriorityBadge = ({ priority }) => {
-  const styles = priority === 'High' ? 'bg-red-100 text-red-600' : priority === 'Medium' ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-600';
-  return <span className={`text-[9px] px-2 py-0.5 rounded font-black uppercase tracking-wider ${styles}`}>{priority}</span>;
-};
-
-const EmptyState = ({ icon, text }) => (
-  <div className="flex flex-col items-center justify-center py-24 text-slate-300 border-4 border-dashed border-slate-100 rounded-[3rem] bg-white/50">
-    <div className="mb-6 bg-slate-50 p-6 rounded-full">{icon}</div>
-    <p className="text-xl font-bold tracking-tight text-slate-400">{text}</p>
-  </div>
-);
-
-// Reuse generic Modal Layout
-const ModalFrame = ({ isOpen, close, title, children }) => {
-  if (!isOpen) return null;
-  return (
-    <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="px-8 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-          <h2 className="text-xl font-bold text-slate-800">{title}</h2>
-          <button onClick={close} className="p-2 hover:bg-white rounded-xl shadow-sm"><X size={20}/></button>
-        </div>
-        {children}
-      </div>
-    </div>
-  );
-};
-
-const EntryModal = ({ isOpen, close, form, setForm, save, editing }) => (
-  <ModalFrame isOpen={isOpen} close={close} title={editing ? 'Edit Entry' : 'New Entry'}>
-    <form onSubmit={save} className="p-8 space-y-5">
-      <div className="grid grid-cols-2 gap-4">
-        <input type="date" required className="input-field" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
-        <select className="input-field" value={form.type} onChange={e => setForm({...form, type: e.target.value})}>
-          <option value="Work">Daily Work</option><option value="Study">Study</option><option value="Special">Special</option>
-        </select>
-      </div>
-      <input type="text" required placeholder="Title" className="input-field font-bold" value={form.title} onChange={e => setForm({...form, title: e.target.value})} />
-      <textarea rows="5" required placeholder="Content..." className="input-field" value={form.content} onChange={e => setForm({...form, content: e.target.value})}></textarea>
-      <button className="btn-save bg-blue-600">Save to Cloud</button>
-    </form>
-  </ModalFrame>
-);
-
-const TaskModal = ({ isOpen, close, form, setForm, save, editing }) => (
-  <ModalFrame isOpen={isOpen} close={close} title={editing ? 'Edit Task' : 'New Task'}>
-    <form onSubmit={save} className="p-8 space-y-6">
-      <input type="text" required placeholder="Goal Description" className="input-field font-bold" value={form.text} onChange={e => setForm({...form, text: e.target.value})} />
-      <div className="grid grid-cols-3 gap-3">
-        {['Low', 'Medium', 'High'].map(p => (
-          <button key={p} type="button" onClick={() => setForm({...form, priority: p})} className={`py-3 rounded-2xl text-[10px] font-black uppercase border-2 ${form.priority === p ? 'bg-slate-900 text-white' : 'text-slate-400'}`}>{p}</button>
-        ))}
-      </div>
-      <button className="btn-save bg-emerald-600">Save Goal</button>
-    </form>
-  </ModalFrame>
-);
-
-const VaultModal = ({ isOpen, close, form, setForm, save, editing }) => (
-  <ModalFrame isOpen={isOpen} close={close} title={editing ? 'Edit Vault' : 'Add to Vault'}>
-    <form onSubmit={save} className="p-8 space-y-5">
-      <div className="grid grid-cols-2 gap-4">
-        <select className="input-field" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
-          <option value="Event">Event</option><option value="Person">Person</option><option value="Thing">Thing</option>
-        </select>
-        <input type="date" className="input-field" value={form.date} onChange={e => setForm({...form, date: e.target.value})} />
-      </div>
-      <input type="text" required placeholder="Subject Name" className="input-field font-bold" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
-      <textarea rows="4" required placeholder="Notes..." className="input-field" value={form.details} onChange={e => setForm({...form, details: e.target.value})}></textarea>
-      <button className="btn-save bg-purple-600">Secure to Vault</button>
-    </form>
-  </ModalFrame>
-);
-
-// Shared CSS Patterns via Tailwind pseudo-components
-const styles = `
-.input-field { @apply w-full px-4 py-3 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all; }
-.btn-save { @apply w-full text-white font-black py-4 rounded-2xl transition-all shadow-lg active:scale-[0.98]; }
-`;
-
-export default App;
+        render(h(App), document.body);
+        setInterval(() => lucide.createIcons(), 300);
+    </script>
+    <style>
+        body { margin: 0; scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+</head>
+<body></body>
+</html>
