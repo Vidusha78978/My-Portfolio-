@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity & Greeting Logic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: white;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #greeting-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            transition: opacity 0.8s ease-out;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .animate-up {
+            animation: slideUp 0.8s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .redirect-notice {
+            position: absolute;
+            bottom: 2rem;
+            font-size: 0.875rem;
+            color: #64748b;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Greeting Overlay -->
+    <div id="greeting-overlay">
+        <div class="text-center px-6 animate-up">
+            <h1 id="time-greeting" class="text-4xl md:text-6xl font-light mb-2">Hello,</h1>
+            <h2 id="user-identity" class="text-3xl md:text-5xl font-bold text-gradient mb-8">Detecting...</h2>
+            
+            <!-- Visual loader -->
+            <div id="loading-bar" class="w-48 h-1 bg-gray-700 mx-auto rounded-full overflow-hidden">
+                <div class="h-full bg-blue-500 w-0 transition-all duration-1000 ease-in-out" id="progress"></div>
+            </div>
+        </div>
+
+        <p class="redirect-notice animate-pulse">Entering Portfolio...</p>
+    </div>
+
+    <script>
+        /**
+         * 1. IDENTIFY USER LOGIC
+         */
+        function getIdentity() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const emailParam = urlParams.get('email');
+                const nameParam = urlParams.get('name');
+                const storedIdentity = localStorage.getItem('user_id');
+
+                if (emailParam) {
+                    localStorage.setItem('user_id', emailParam);
+                    return emailParam;
+                } 
+                
+                if (nameParam) {
+                    localStorage.setItem('user_id', nameParam);
+                    return nameParam;
+                }
+
+                return storedIdentity || "Guest";
+            } catch (e) {
+                console.warn("Identity check failed:", e);
+                return "Guest";
+            }
+        }
+
+        /**
+         * 2. TIME GREETING LOGIC
+         */
+        function getTimeGreeting() {
+            const hour = new Date().getHours();
+            if (hour < 12) return "Good Morning,";
+            if (hour < 17) return "Good Afternoon,";
+            return "Good Evening,";
+        }
+
+        /**
+         * 3. INITIALIZATION & REDIRECT
+         */
+        function init() {
+            const timeGreetingEl = document.getElementById('time-greeting');
+            const userIdEl = document.getElementById('user-identity');
+            const progress = document.getElementById('progress');
+
+            // Apply Greetings
+            const identity = getIdentity();
+            timeGreetingEl.textContent = getTimeGreeting();
+            userIdEl.textContent = identity;
+
+            // Start progress bar animation
+            setTimeout(() => { 
+                if (progress) progress.style.width = '100%'; 
+            }, 100);
+
+            // Redirect to home.html after 3 seconds
+            setTimeout(() => {
+                try {
+                    // Use window.location.href directly for better compatibility
+                    // Adding ./ ensures it's treated as a relative path if supported
+                    window.location.href = "./home.html";
+                } catch (err) {
+                    console.error("Redirection error:", err);
+                    // Fallback attempt
+                    window.location.assign("home.html");
+                }
+            }, 3000);
+        }
+
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
