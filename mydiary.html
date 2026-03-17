@@ -16,11 +16,12 @@
         import { h, render } from 'https://esm.sh/preact';
         import { useState, useEffect } from 'https://esm.sh/preact/hooks';
 
-        // --- GLOBAL CONFIG ---
+        // --- GLOBAL CONFIG (Provided by Environment) ---
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : null;
-        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : "diary-app-vidusha";
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : "diary-app-vidusha-final";
+        const INITIAL_TOKEN = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         function App() {
             const [user, setUser] = useState(null);
@@ -32,6 +33,7 @@
             const [syncInput, setSyncInput] = useState('');
             const [loading, setLoading] = useState(true);
 
+            // 1. Initialize Auth
             useEffect(() => {
                 if (!firebaseConfig) {
                     setLoading(false);
@@ -43,8 +45,8 @@
 
                 const initAuth = async () => {
                     try {
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            await signInWithCustomToken(auth, __initial_auth_token);
+                        if (INITIAL_TOKEN) {
+                            await signInWithCustomToken(auth, INITIAL_TOKEN);
                         } else {
                             await signInAnonymously(auth);
                         }
@@ -59,9 +61,11 @@
                 return onAuthStateChanged(auth, (u) => setUser(u));
             }, []);
 
+            // 2. Real-time Data Listeners
             useEffect(() => {
                 if (!user || !firebaseConfig) return;
                 const db = getFirestore();
+                // Check if user has a manually synced ID saved
                 const uid = localStorage.getItem('diary_uid') || user.uid;
 
                 const unsubEntries = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'entries'), 
@@ -78,7 +82,11 @@
                 if (!user || !firebaseConfig) return;
                 const db = getFirestore();
                 const uid = localStorage.getItem('diary_uid') || user.uid;
-                await setDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', key), { list });
+                try {
+                    await setDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', key), { list });
+                } catch (e) {
+                    console.error("Save failed", e);
+                }
             };
 
             const addNew = () => {
@@ -106,90 +114,134 @@
             };
 
             const remove = (key, id) => {
-                if (!confirm("Delete this?")) return;
+                if (!confirm("Are you sure you want to delete this?")) return;
                 let newList;
-                if (key === 'entries') newList = entries.filter(e => e.id !== id);
-                else if (key === 'tasks') newList = tasks.filter(t => t.id !== id);
-                else newList = vault.filter(v => v.id !== id);
-                
-                if (key === 'entries') setEntries(newList);
-                else if (key === 'tasks') setTasks(newList);
-                else setVault(newList);
+                if (key === 'entries') {
+                    newList = entries.filter(e => e.id !== id);
+                    setEntries(newList);
+                } else if (key === 'tasks') {
+                    newList = tasks.filter(t => t.id !== id);
+                    setTasks(newList);
+                } else {
+                    newList = vault.filter(v => v.id !== id);
+                    setVault(newList);
+                }
                 saveData(key, newList);
             };
 
-            if (loading) return h('div', { class: 'h-screen flex items-center justify-center bg-slate-50 font-sans' }, h('p', { class: 'text-slate-400 font-bold animate-pulse' }, "Connecting to Cloud..."));
+            if (loading) return h('div', { class: 'h-screen flex items-center justify-center bg-white' }, h('div', { class: 'animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600' }));
 
-            if (!firebaseConfig) return h('div', { class: 'h-screen flex items-center justify-center bg-slate-100 p-6 text-center font-sans' }, 
-                h('div', { class: 'bg-white p-8 rounded-3xl shadow-xl' }, [
-                    h('h1', { class: 'text-2xl font-bold mb-4' }, "Launch Required"),
-                    h('p', { class: 'text-slate-500' }, "Please click the 'Preview' button in the toolbar to start the app.")
+            if (!firebaseConfig) return h('div', { class: 'h-screen flex items-center justify-center bg-slate-50 p-6' }, 
+                h('div', { class: 'bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-sm text-center' }, [
+                    h('div', { class: 'bg-blue-50 text-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6' }, h('i', { 'data-lucide': 'cloud-lightning' })),
+                    h('h1', { class: 'text-2xl font-black mb-3 text-slate-800' }, "Preview Required"),
+                    h('p', { class: 'text-slate-500 text-sm leading-relaxed mb-8' }, "This app requires the platform's secure cloud environment. Please click the 'Preview' button in the header."),
+                    h('button', { onClick: () => window.location.reload(), class: 'w-full bg-blue-600 text-white py-4 rounded-2xl font-bold' }, "Reload App")
                 ])
             );
 
             const currentUid = localStorage.getItem('diary_uid') || (user ? user.uid : '...');
 
             return h('div', { class: 'min-h-screen bg-slate-50 flex font-sans' }, [
-                // Sidebar
-                h('nav', { class: 'w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col' }, [
-                    h('div', { class: 'p-6 font-black text-xl text-blue-600 hidden md:block' }, "VIDUSHA DIARY"),
-                    h('div', { class: 'flex-1 p-4 space-y-2' }, [
-                        h('button', { onClick: () => setActiveTab('daily'), class: `w-full p-4 rounded-2xl flex items-center gap-3 ${activeTab === 'daily' ? 'bg-blue-50 text-blue-600' : 'text-slate-400'}` }, [h('i', { 'data-lucide': 'book-open' }), h('span', { class: 'hidden md:block font-bold' }, "Daily Logs")]),
-                        h('button', { onClick: () => setActiveTab('tasks'), class: `w-full p-4 rounded-2xl flex items-center gap-3 ${activeTab === 'tasks' ? 'bg-emerald-50 text-emerald-600' : 'text-slate-400'}` }, [h('i', { 'data-lucide': 'check-square' }), h('span', { class: 'hidden md:block font-bold' }, "Tasks")]),
-                        h('button', { onClick: () => setActiveTab('vault'), class: `w-full p-4 rounded-2xl flex items-center gap-3 ${activeTab === 'vault' ? 'bg-purple-50 text-purple-600' : 'text-slate-400'}` }, [h('i', { 'data-lucide': 'star' }), h('span', { class: 'hidden md:block font-bold' }, "Special Vault")])
+                // Navigation Sidebar
+                h('nav', { class: 'w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col fixed h-full z-10' }, [
+                    h('div', { class: 'p-6 font-black text-xl text-blue-600 hidden md:flex items-center gap-2' }, [
+                        h('i', { 'data-lucide': 'book-marked' }), "CLOUD DIARY"
                     ]),
-                    h('div', { class: 'p-4 border-t' }, [
-                        h('button', { onClick: () => setShowSync(true), class: 'text-[10px] font-mono text-slate-400 truncate w-full hover:text-blue-600' }, currentUid)
+                    h('div', { class: 'flex-1 p-4 space-y-2' }, [
+                        h('button', { onClick: () => setActiveTab('daily'), class: `w-full p-4 rounded-2xl flex items-center gap-3 transition-all ${activeTab === 'daily' ? 'bg-blue-50 text-blue-600 shadow-sm' : 'text-slate-400 hover:bg-slate-50'}` }, [h('i', { 'data-lucide': 'edit-3' }), h('span', { class: 'hidden md:block font-bold' }, "Daily Logs")]),
+                        h('button', { onClick: () => setActiveTab('tasks'), class: `w-full p-4 rounded-2xl flex items-center gap-3 transition-all ${activeTab === 'tasks' ? 'bg-emerald-50 text-emerald-600 shadow-sm' : 'text-slate-400 hover:bg-slate-50'}` }, [h('i', { 'data-lucide': 'check-circle' }), h('span', { class: 'hidden md:block font-bold' }, "Tasks")]),
+                        h('button', { onClick: () => setActiveTab('vault'), class: `w-full p-4 rounded-2xl flex items-center gap-3 transition-all ${activeTab === 'vault' ? 'bg-purple-50 text-purple-600 shadow-sm' : 'text-slate-400 hover:bg-slate-50'}` }, [h('i', { 'data-lucide': 'shield-check' }), h('span', { class: 'hidden md:block font-bold' }, "The Vault")])
+                    ]),
+                    h('div', { class: 'p-6 border-t border-slate-100' }, [
+                        h('div', { class: 'bg-slate-50 rounded-xl p-3 relative group' }, [
+                             h('p', { class: 'text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1' }, "Cloud Sync ID"),
+                             h('p', { class: 'text-[10px] font-mono text-slate-500 break-all leading-tight' }, currentUid),
+                             h('button', { onClick: () => setShowSync(true), class: 'mt-2 w-full text-[10px] font-bold text-blue-600 flex items-center justify-center gap-1 py-1 hover:bg-blue-100 rounded-lg transition-colors' }, [
+                                h('i', { 'data-lucide': 'refresh-cw', class: 'w-3 h-3' }), "Sync Account"
+                             ])
+                        ])
                     ])
                 ]),
 
-                // Content
-                h('main', { class: 'flex-1 p-6 md:p-12 overflow-y-auto' }, [
-                    h('div', { class: 'flex justify-between items-center mb-8' }, [
-                        h('div', {}, [
-                            h('h2', { class: 'text-3xl font-black text-slate-800 uppercase' }, activeTab),
-                            h('p', { class: 'text-slate-400 font-medium' }, "Syncing to your private cloud.")
+                // Content Area
+                h('main', { class: 'flex-1 ml-20 md:ml-64 p-6 md:p-12' }, [
+                    h('div', { class: 'max-w-4xl mx-auto' }, [
+                        h('header', { class: 'flex justify-between items-end mb-12' }, [
+                            h('div', {}, [
+                                h('h2', { class: 'text-4xl font-black text-slate-800' }, 
+                                    activeTab === 'daily' ? 'Stories' : activeTab === 'tasks' ? 'Goals' : 'Vault'),
+                                h('p', { class: 'text-slate-400 font-medium mt-1' }, "Secure cloud-synced dashboard.")
+                            ]),
+                            h('button', { onClick: addNew, class: 'bg-slate-900 text-white px-8 py-4 rounded-2xl font-black shadow-2xl hover:bg-black transition transform active:scale-95' }, "+ New")
                         ]),
-                        h('button', { onClick: addNew, class: 'bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold shadow-xl hover:bg-black transition' }, "+ Add Entry")
-                    ]),
 
-                    activeTab === 'daily' && h('div', { class: 'space-y-4' }, entries.map(e => h('div', { class: 'bg-white p-6 rounded-3xl border border-slate-100 relative group' }, [
-                        h('span', { class: 'text-[10px] font-bold text-slate-300 uppercase' }, e.date),
-                        h('h3', { class: 'text-xl font-bold text-slate-800' }, e.title),
-                        h('p', { class: 'text-slate-500 mt-2' }, e.content),
-                        h('button', { onClick: () => remove('entries', e.id), class: 'absolute top-6 right-6 opacity-0 group-hover:opacity-100 text-red-400' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
-                    ]))),
+                        // Daily Logs
+                        activeTab === 'daily' && h('div', { class: 'space-y-6' }, entries.length === 0 ? h(Empty, { icon: 'edit-3', text: 'Write your first story...' }) : entries.map(e => h('div', { class: 'bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm relative group hover:border-blue-200 transition-all' }, [
+                            h('div', { class: 'flex items-center gap-3 mb-3' }, [
+                                h('span', { class: 'text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase' }, e.date),
+                            ]),
+                            h('h3', { class: 'text-2xl font-bold text-slate-800 mb-2' }, e.title),
+                            h('p', { class: 'text-slate-500 leading-relaxed text-lg' }, e.content),
+                            h('button', { onClick: () => remove('entries', e.id), class: 'absolute top-8 right-8 opacity-0 group-hover:opacity-100 text-slate-200 hover:text-red-500 transition-all' }, h('i', { 'data-lucide': 'trash-2' }))
+                        ]))),
 
-                    activeTab === 'tasks' && h('div', { class: 'bg-white rounded-3xl overflow-hidden' }, tasks.map(t => h('div', { class: 'p-5 flex items-center gap-4 border-b last:border-0' }, [
-                        h('input', { type: 'checkbox', checked: t.completed, onChange: () => toggleTask(t.id), class: 'w-5 h-5 accent-emerald-500' }),
-                        h('span', { class: `flex-1 font-bold ${t.completed ? 'line-through text-slate-300' : 'text-slate-700'}` }, t.text),
-                        h('button', { onClick: () => remove('tasks', t.id), class: 'text-slate-200 hover:text-red-400' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
-                    ]))),
+                        // Tasks
+                        activeTab === 'tasks' && h('div', { class: 'bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm' }, tasks.length === 0 ? h(Empty, { icon: 'check-circle', text: 'No tasks for today.' }) : tasks.map(t => h('div', { class: 'p-6 flex items-center gap-5 border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition' }, [
+                            h('button', { onClick: () => toggleTask(t.id), class: `w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${t.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 text-transparent hover:border-emerald-300'}` }, h('i', { 'data-lucide': 'check', class: 'w-4 h-4' })),
+                            h('span', { class: `flex-1 text-xl font-bold ${t.completed ? 'line-through text-slate-300' : 'text-slate-700'}` }, t.text),
+                            h('button', { onClick: () => remove('tasks', t.id), class: 'text-slate-200 hover:text-red-400' }, h('i', { 'data-lucide': 'trash-2', class: 'w-5 h-5' }))
+                        ]))),
 
-                    activeTab === 'vault' && h('div', { class: 'grid md:grid-cols-2 lg:grid-cols-3 gap-6' }, vault.map(v => h('div', { class: 'bg-white p-6 rounded-3xl border border-slate-100 hover:shadow-lg transition' }, [
-                        h('div', { class: 'flex justify-between mb-2' }, [
-                            h('span', { class: 'px-2 py-1 bg-purple-100 text-purple-600 text-[9px] font-black rounded-lg uppercase' }, v.category),
-                            h('button', { onClick: () => remove('vault', v.id), class: 'text-slate-200 hover:text-red-400' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
-                        ]),
-                        h('h3', { class: 'font-bold text-slate-800' }, v.name),
-                        h('p', { class: 'text-xs text-slate-400' }, v.date),
-                        h('p', { class: 'text-sm text-slate-500 mt-3 italic' }, v.details)
-                    ]))),
+                        // Special Vault
+                        activeTab === 'vault' && h('div', { class: 'grid md:grid-cols-2 gap-6' }, vault.length === 0 ? h('div', { class: 'col-span-full' }, h(Empty, { icon: 'shield-check', text: 'The vault is empty.' })) : vault.map(v => h('div', { class: 'bg-white p-8 rounded-[2.5rem] border border-slate-100 hover:shadow-xl transition group relative' }, [
+                            h('div', { class: 'flex justify-between items-start mb-6' }, [
+                                h('div', { class: `p-4 rounded-2xl ${v.category === 'Person' ? 'bg-purple-100 text-purple-600' : 'bg-orange-100 text-orange-600'}` }, h('i', { 'data-lucide': v.category === 'Person' ? 'user' : 'calendar' })),
+                                h('button', { onClick: () => remove('vault', v.id), class: 'opacity-0 group-hover:opacity-100 text-slate-200 hover:text-red-400 transition' }, h('i', { 'data-lucide': 'trash-2' }))
+                            ]),
+                            h('h3', { class: 'text-2xl font-black text-slate-800' }, v.name),
+                            h('p', { class: 'text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 mb-4' }, `${v.category} • ${v.date || 'TBC'}`),
+                            h('p', { class: 'text-slate-500 text-sm leading-relaxed italic border-l-4 border-slate-100 pl-4' }, v.details)
+                        ])))
+                    ])
+                ]),
 
-                    // Sync UI
-                    showSync && h('div', { class: 'fixed inset-0 bg-white/80 backdrop-blur-md flex items-center justify-center p-6 z-50' }, h('div', { class: 'max-w-xs w-full text-center' }, [
-                        h('h2', { class: 'text-xl font-bold mb-4' }, "Cloud Sync"),
-                        h('input', { placeholder: "Paste User ID", value: syncInput, onInput: (e) => setSyncInput(e.target.value), class: 'w-full p-4 rounded-2xl bg-slate-100 mb-4 border-0 font-mono text-xs' }),
-                        h('button', { onClick: () => { localStorage.setItem('diary_uid', syncInput); window.location.reload(); }, class: 'w-full bg-blue-600 text-white p-4 rounded-2xl font-bold mb-2' }, "Connect Account"),
-                        h('button', { onClick: () => setShowSync(false), class: 'text-slate-400 text-sm' }, "Cancel")
-                    ]))
-                ])
+                // Sync Modal
+                showSync && h('div', { class: 'fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 z-50' }, h('div', { class: 'bg-white p-10 rounded-[3rem] max-w-sm w-full shadow-2xl animate-in fade-in zoom-in duration-300' }, [
+                    h('div', { class: 'bg-blue-50 text-blue-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6' }, h('i', { 'data-lucide': 'refresh-cw', class: 'animate-spin-slow' })),
+                    h('h2', { class: 'text-2xl font-black text-center mb-2' }, "Connect Cloud"),
+                    h('p', { class: 'text-slate-400 text-center text-sm mb-8 font-medium' }, "Sync your diary to this device by pasting your Cloud ID below."),
+                    h('input', { placeholder: "Paste User ID here...", value: syncInput, onInput: (e) => setSyncInput(e.target.value), class: 'w-full p-5 rounded-2xl bg-slate-50 border-0 focus:ring-4 focus:ring-blue-500/10 font-mono text-xs mb-4 outline-none transition-all' }),
+                    h('div', { class: 'space-y-3' }, [
+                        h('button', { onClick: () => { if(!syncInput.trim()) return; localStorage.setItem('diary_uid', syncInput.trim()); window.location.reload(); }, class: 'w-full bg-blue-600 text-white p-5 rounded-2xl font-bold shadow-lg shadow-blue-100' }, "Sync & Reload"),
+                        h('button', { onClick: () => { localStorage.removeItem('diary_uid'); window.location.reload(); }, class: 'w-full text-red-400 font-bold py-2 text-xs uppercase tracking-widest' }, "Reset to Local"),
+                        h('button', { onClick: () => setShowSync(false), class: 'w-full text-slate-300 font-bold py-2 text-sm' }, "Cancel")
+                    ])
+                ]))
             ]);
         }
 
+        const Empty = ({ icon, text }) => h('div', { class: 'py-20 text-center' }, [
+            h('div', { class: 'bg-slate-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200' }, h('i', { 'data-lucide': icon, class: 'w-10 h-10' })),
+            h('p', { class: 'text-slate-300 font-bold text-xl' }, text)
+        ]);
+
         render(h(App), document.body);
-        setInterval(() => lucide.createIcons(), 500);
+        
+        // Icon Refresh Loop
+        setInterval(() => {
+            if (window.lucide) window.lucide.createIcons();
+        }, 500);
     </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; }
+        main { height: 100vh; overflow-y: auto; scroll-behavior: smooth; }
+        .animate-spin-slow { animation: spin 4s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
 </head>
 <body class="bg-slate-50"></body>
 </html>
