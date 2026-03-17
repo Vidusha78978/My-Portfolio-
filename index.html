@@ -54,17 +54,42 @@
             color: #64748b;
             letter-spacing: 0.05em;
         }
+
+        /* Sticker Container */
+        .sticker-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .sticker-svg {
+            filter: drop-shadow(0 0 15px rgba(96, 165, 250, 0.4));
+            transition: transform 0.5s ease;
+        }
+
+        /* Rain Animation */
+        .rain-drop {
+            animation: rainFall 1s linear infinite;
+        }
+
+        @keyframes rainFall {
+            0% { transform: translateY(-5px); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(10px); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Greeting Overlay -->
     <div id="greeting-overlay">
         <div class="text-center px-6 animate-up">
+            <!-- Dynamic Sticker Section -->
+            <div id="time-sticker" class="sticker-container"></div>
+            
             <h1 id="time-greeting" class="text-4xl md:text-6xl font-light mb-2">Hello,</h1>
             <h2 id="user-identity" class="text-3xl md:text-5xl font-bold text-gradient mb-8">Identifying...</h2>
             
-            <!-- Visual loader -->
             <div id="loading-bar" class="w-48 h-1 bg-gray-700 mx-auto rounded-full overflow-hidden">
                 <div class="h-full bg-blue-500 w-0 transition-all duration-1500 ease-in-out" id="progress"></div>
             </div>
@@ -74,94 +99,86 @@
     </div>
 
     <script>
-        /**
-         * 1. ADVANCED IDENTIFY USER LOGIC
-         * - Priority 1: URL Parameters (Useful if you send a link via email)
-         * - Priority 2: Local Storage (Returning visitors)
-         * - Priority 3: Browser/Device Fingerprint (Unique ID based on hardware)
-         */
         function getIdentity() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
-                
-                // Try to find email or name in URL: ?email=... or ?name=...
                 const fromUrl = urlParams.get('email') || urlParams.get('name') || urlParams.get('user');
-                
                 if (fromUrl) {
                     localStorage.setItem('user_id', fromUrl);
                     return fromUrl;
                 } 
-                
-                // Check if we already have them saved in this browser
                 const storedIdentity = localStorage.getItem('user_id');
-                if (storedIdentity) return storedIdentity;
-
-                // Create a "Fingerprint" based on screen and browser info to recognize the device
-                const fingerprint = [
-                    navigator.language,
-                    window.screen.colorDepth,
-                    window.screen.width + 'x' + window.screen.height,
-                    new Date().getTimezoneOffset()
-                ].join('|');
-
-                // Hash-like short string from fingerprint
-                let hash = 0;
-                for (let i = 0; i < fingerprint.length; i++) {
-                    hash = ((hash << 5) - hash) + fingerprint.charCodeAt(i);
-                    hash |= 0; 
-                }
-                
-                const uniqueId = "User-" + Math.abs(hash).toString(16).toUpperCase();
-                localStorage.setItem('user_id', uniqueId);
-                
-                return uniqueId;
+                return storedIdentity || "Friend";
             } catch (e) {
-                console.warn("Identity check failed:", e);
-                return "Visitor";
+                return "Friend";
             }
         }
 
-        /**
-         * 2. TIME GREETING LOGIC
-         */
-        function getTimeGreeting() {
+        function getTimeData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const weather = urlParams.get('weather');
             const hour = new Date().getHours();
-            if (hour < 12) return "Good Morning,";
-            if (hour < 17) return "Good Afternoon,";
-            return "Good Evening,";
+
+            // 1. Check for RAIN sticker first (Manual trigger for demo)
+            if (weather === 'rain') {
+                return {
+                    text: "Stay Dry,",
+                    sticker: `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 sticker-svg text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.5 19c.7 0 1.2-.6 1.2-1.2 0-.9-.9-1.3-1.2-2.3-.3 1-1.2 1.4-1.2 2.3 0 .6.5 1.2 1.2 1.2z"/>
+                        <path d="M12 19c.7 0 1.2-.6 1.2-1.2 0-.9-.9-1.3-1.2-2.3-.3 1-1.2 1.4-1.2 2.3 0 .6.5 1.2 1.2 1.2z"/>
+                        <path d="M6.5 19c.7 0 1.2-.6 1.2-1.2 0-.9-.9-1.3-1.2-2.3-.3 1-1.2 1.4-1.2 2.3 0 .6.5 1.2 1.2 1.2z"/>
+                        <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/>
+                    </svg>`
+                };
+            }
+
+            // 2. Default Time Stickers
+            if (hour >= 5 && hour < 12) {
+                // Morning Sun
+                return {
+                    text: "Good Morning,",
+                    sticker: `<svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 sticker-svg text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`
+                };
+            }
+            if (hour >= 12 && hour < 17) {
+                // Afternoon Sun (Bright)
+                return {
+                    text: "Good Afternoon,",
+                    sticker: `<svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 sticker-svg text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="m16 12-4 4-4-4"/></svg>`
+                };
+            }
+            // Night Moon
+            return {
+                text: "Good Evening,",
+                sticker: `<svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 sticker-svg text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`
+            };
         }
 
-        /**
-         * 3. INITIALIZATION & REDIRECT
-         */
         function init() {
             const timeGreetingEl = document.getElementById('time-greeting');
             const userIdEl = document.getElementById('user-identity');
+            const stickerEl = document.getElementById('time-sticker');
             const progress = document.getElementById('progress');
 
-            // Apply Greetings
             const identity = getIdentity();
-            timeGreetingEl.textContent = getTimeGreeting();
+            const timeData = getTimeData();
+
+            timeGreetingEl.textContent = timeData.text;
+            stickerEl.innerHTML = timeData.sticker;
             userIdEl.textContent = identity;
 
-            // Start progress bar animation
-            setTimeout(() => { 
-                if (progress) progress.style.width = '100%'; 
-            }, 100);
+            setTimeout(() => { if (progress) progress.style.width = '100%'; }, 100);
 
-            // Redirect to home.html after 3 seconds
             setTimeout(() => {
                 try {
-                    // Try direct relative path first
                     window.location.href = "home.html";
                 } catch (err) {
-                    console.error("Redirection error:", err);
                     window.location.assign("./home.html");
                 }
             }, 3000);
         }
 
-        // Wait for DOM to be ready
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
