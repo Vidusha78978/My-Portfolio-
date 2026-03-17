@@ -9,6 +9,105 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
     <style>
+
+          /* Container for stacking buttons - Moved up to bottom: 80px */
+  .fab-container {
+    position: fixed;
+    bottom: 80px; /* Moved up from 30px */
+    right: 30px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 15px; /* Space between buttons */
+  }
+
+  /* Base style for all FABs */
+  .fab-button {
+    text-decoration: none;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: white !important;
+    padding: 15px 25px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-weight: 600;
+    position: relative;
+    white-space: nowrap;
+  }
+
+  /* Payment Button Style (Gold) */
+  .donation-fab {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+  }
+
+  /* Message Button Style (Blue) */
+  .message-fab {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+  }
+
+  /* Universal Pulse Animation */
+  .fab-button::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: inherit;
+    border-radius: inherit;
+    z-index: -1;
+    animation: pulse-effect 2.5s infinite;
+  }
+
+  .fab-button:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .fab-button svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse-effect {
+    0% { transform: scale(1); opacity: 0.6; }
+    70% { transform: scale(1.3); opacity: 0; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+
+  /* Mobile Adjustments - Icon Only View */
+  @media (max-width: 768px) {
+    .fab-container {
+      bottom: 60px; /* Moved up from 20px */
+      right: 20px;
+      gap: 12px;
+    }
+    
+    .fab-button {
+      padding: 0;
+      width: 55px; /* Fixed width for circle */
+      height: 55px; /* Fixed height for circle */
+      border-radius: 50%; /* Perfect circle */
+    }
+
+    /* Hide the text label on mobile */
+    .fab-button span {
+      display: none;
+    }
+
+    .fab-button svg {
+      width: 24px;
+      height: 24px;
+    }
+  }
         tailwind.config = {
             theme: {
                 extend: {
@@ -50,6 +149,24 @@
     </style>
 </head>
 <body class="font-sans flex flex-col min-h-screen">
+
+    <div class="fab-container">
+  <!-- Top Button: Payments & Donations -->
+  <a href="https://www.vidushachathuranga.wuaze.com/payment_donations.html" class="fab-button donation-fab" title="Payments & Donations">
+    <svg viewBox="0 0 24 24">
+      <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+    </svg>
+    <span>Payments & Donations</span>
+  </a>
+
+  <!-- Bottom Button: Send a Message -->
+  <a href="https://www.vidushachathuranga.wuaze.com/contact.html" class="fab-button message-fab" title="Send a Message">
+    <svg viewBox="0 0 24 24">
+      <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+    </svg>
+    <span>Send a Message</span>
+  </a>
+</div>
 
     <!-- Header & Navigation -->
     <header class="sticky top-0 z-40 bg-primary-dark/95 backdrop-blur-sm shadow-lg border-b border-secondary-dark">
