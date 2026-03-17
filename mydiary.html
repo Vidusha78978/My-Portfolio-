@@ -13,26 +13,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { h, render, Component } from 'https://esm.sh/preact';
-        import { useState, useEffect, useMemo } from 'https://esm.sh/preact/hooks';
+        import { h, render } from 'https://esm.sh/preact';
+        import { useState, useEffect } from 'https://esm.sh/preact/hooks';
 
-        // --- DYNAMIC CONFIGURATION ---
-        let firebaseConfig;
-        let isConfigured = false;
-
-        try {
-            if (typeof __firebase_config !== 'undefined') {
-                firebaseConfig = JSON.parse(__firebase_config);
-                isConfigured = true;
-            } else {
-                // Fallback for local testing (User would need to fill this to work locally)
-                firebaseConfig = { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
-            }
-        } catch (e) {
-            console.error("Config error", e);
-        }
-
-        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : "diary-app-v1";
+        // --- GLOBAL CONFIG ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' 
+            ? JSON.parse(__firebase_config) 
+            : null;
+        const APP_ID = typeof __app_id !== 'undefined' ? __app_id : "diary-app-vidusha";
 
         function App() {
             const [user, setUser] = useState(null);
@@ -40,19 +28,18 @@
             const [entries, setEntries] = useState([]);
             const [tasks, setTasks] = useState([]);
             const [vault, setVault] = useState([]);
-            const [showLogin, setShowLogin] = useState(false);
-            const [loginId, setLoginId] = useState('');
-            const [error, setError] = useState(null);
+            const [showSync, setShowSync] = useState(false);
+            const [syncInput, setSyncInput] = useState('');
+            const [loading, setLoading] = useState(true);
 
             useEffect(() => {
-                if (!isConfigured) {
-                    setError("Firebase configuration missing. Please use the 'Preview' button in the editor to run this app correctly.");
+                if (!firebaseConfig) {
+                    setLoading(false);
                     return;
                 }
 
                 const app = initializeApp(firebaseConfig);
                 const auth = getAuth(app);
-                const db = getFirestore(app);
 
                 const initAuth = async () => {
                     try {
@@ -61,171 +48,148 @@
                         } else {
                             await signInAnonymously(auth);
                         }
-                    } catch (e) { 
-                        setError("Connection Error: Make sure you are clicking 'Preview' to start the app session.");
+                    } catch (e) {
+                        console.error("Auth failed", e);
+                    } finally {
+                        setLoading(false);
                     }
                 };
                 
                 initAuth();
-                const unsubscribeAuth = onAuthStateChanged(auth, (u) => setUser(u));
-
-                return () => unsubscribeAuth();
+                return onAuthStateChanged(auth, (u) => setUser(u));
             }, []);
 
             useEffect(() => {
-                if (!user || !isConfigured) return;
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
+                if (!user || !firebaseConfig) return;
+                const db = getFirestore();
                 const uid = localStorage.getItem('diary_uid') || user.uid;
 
                 const unsubEntries = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'entries'), 
-                    (s) => setEntries(s.data()?.list || []), (e) => console.error(e));
+                    (s) => setEntries(s.data()?.list || []), (err) => console.error(err));
                 const unsubTasks = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'tasks'), 
-                    (s) => setTasks(s.data()?.list || []), (e) => console.error(e));
+                    (s) => setTasks(s.data()?.list || []), (err) => console.error(err));
                 const unsubVault = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'vault'), 
-                    (s) => setVault(s.data()?.list || []), (e) => console.error(e));
+                    (s) => setVault(s.data()?.list || []), (err) => console.error(err));
 
                 return () => { unsubEntries(); unsubTasks(); unsubVault(); };
             }, [user]);
 
-            const persist = async (key, list) => {
-                if (!user) return;
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
+            const saveData = async (key, list) => {
+                if (!user || !firebaseConfig) return;
+                const db = getFirestore();
                 const uid = localStorage.getItem('diary_uid') || user.uid;
                 await setDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', key), { list });
             };
 
-            const addItem = (type) => {
-                const title = prompt(`Enter ${type === 'vault' ? 'name' : 'title'}:`);
+            const addNew = () => {
+                const title = prompt("Enter " + (activeTab === 'vault' ? "Name" : "Title") + ":");
                 if (!title) return;
-                
-                if (type === 'entry') {
-                    const content = prompt("Enter description:");
+
+                if (activeTab === 'daily') {
+                    const content = prompt("Description:");
                     const newList = [{ id: Date.now(), title, content, date: new Date().toLocaleDateString() }, ...entries];
-                    setEntries(newList); persist('entries', newList);
-                } else if (type === 'task') {
+                    setEntries(newList); saveData('entries', newList);
+                } else if (activeTab === 'tasks') {
                     const newList = [{ id: Date.now(), text: title, completed: false }, ...tasks];
-                    setTasks(newList); persist('tasks', newList);
-                } else if (type === 'vault') {
-                    const category = prompt("Category (Person/Event/Thing):", "Person");
-                    const details = prompt("Details/Notes:");
+                    setTasks(newList); saveData('tasks', newList);
+                } else if (activeTab === 'vault') {
+                    const category = prompt("Category (Person/Event/Special):", "Person");
+                    const details = prompt("Details:");
                     const newList = [{ id: Date.now(), name: title, category, details, date: new Date().toLocaleDateString() }, ...vault];
-                    setVault(newList); persist('vault', newList);
+                    setVault(newList); saveData('vault', newList);
                 }
             };
 
             const toggleTask = (id) => {
                 const newList = tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-                setTasks(newList); persist('tasks', newList);
+                setTasks(newList); saveData('tasks', newList);
             };
 
-            const deleteItem = (key, id) => {
-                if (!confirm("Delete this item?")) return;
+            const remove = (key, id) => {
+                if (!confirm("Delete this?")) return;
                 let newList;
-                if (key === 'entries') { newList = entries.filter(e => e.id !== id); setEntries(newList); }
-                else if (key === 'tasks') { newList = tasks.filter(t => t.id !== id); setTasks(newList); }
-                else { newList = vault.filter(v => v.id !== id); setVault(newList); }
-                persist(key, newList);
+                if (key === 'entries') newList = entries.filter(e => e.id !== id);
+                else if (key === 'tasks') newList = tasks.filter(t => t.id !== id);
+                else newList = vault.filter(v => v.id !== id);
+                
+                if (key === 'entries') setEntries(newList);
+                else if (key === 'tasks') setTasks(newList);
+                else setVault(newList);
+                saveData(key, newList);
             };
 
-            if (error) {
-                return h('div', { class: 'min-h-screen flex items-center justify-center bg-slate-100 p-4' }, [
-                    h('div', { class: 'bg-white p-8 rounded-3xl shadow-xl max-w-md text-center' }, [
-                        h('div', { class: 'bg-red-50 text-red-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4' }, h('i', { 'data-lucide': 'alert-circle' })),
-                        h('h2', { class: 'text-xl font-bold mb-2' }, "Configuration Required"),
-                        h('p', { class: 'text-slate-500 mb-6 text-sm' }, error),
-                        h('button', { onClick: () => window.location.reload(), class: 'bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold' }, "Retry")
-                    ])
-                ]);
-            }
+            if (loading) return h('div', { class: 'h-screen flex items-center justify-center bg-slate-50 font-sans' }, h('p', { class: 'text-slate-400 font-bold animate-pulse' }, "Connecting to Cloud..."));
 
-            const currentId = localStorage.getItem('diary_uid') || (user ? user.uid : 'Connecting...');
+            if (!firebaseConfig) return h('div', { class: 'h-screen flex items-center justify-center bg-slate-100 p-6 text-center font-sans' }, 
+                h('div', { class: 'bg-white p-8 rounded-3xl shadow-xl' }, [
+                    h('h1', { class: 'text-2xl font-bold mb-4' }, "Launch Required"),
+                    h('p', { class: 'text-slate-500' }, "Please click the 'Preview' button in the toolbar to start the app.")
+                ])
+            );
 
-            return h('div', { class: 'min-h-screen bg-slate-50 flex font-sans text-slate-900' }, [
+            const currentUid = localStorage.getItem('diary_uid') || (user ? user.uid : '...');
+
+            return h('div', { class: 'min-h-screen bg-slate-50 flex font-sans' }, [
                 // Sidebar
-                h('nav', { class: 'w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col h-screen sticky top-0 shadow-sm' }, [
-                    h('div', { class: 'p-6 font-bold text-xl hidden md:block text-indigo-600' }, "Cloud Diary"),
+                h('nav', { class: 'w-20 md:w-64 bg-white border-r border-slate-200 flex flex-col' }, [
+                    h('div', { class: 'p-6 font-black text-xl text-blue-600 hidden md:block' }, "VIDUSHA DIARY"),
                     h('div', { class: 'flex-1 p-4 space-y-2' }, [
-                        h('button', { onClick: () => setActiveTab('daily'), class: `w-full p-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === 'daily' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-400 hover:bg-slate-100'}` }, [
-                            h('i', { 'data-lucide': 'book', class: 'w-5 h-5' }), h('span', { class: 'hidden md:inline font-semibold' }, "Daily Logs")
-                        ]),
-                        h('button', { onClick: () => setActiveTab('tasks'), class: `w-full p-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === 'tasks' ? 'bg-emerald-50 text-emerald-600' : 'text-slate-400 hover:bg-slate-100'}` }, [
-                            h('i', { 'data-lucide': 'check-circle', class: 'w-5 h-5' }), h('span', { class: 'hidden md:inline font-semibold' }, "Tasks")
-                        ]),
-                        h('button', { onClick: () => setActiveTab('vault'), class: `w-full p-3 rounded-xl flex items-center gap-3 transition-all ${activeTab === 'vault' ? 'bg-purple-50 text-purple-600' : 'text-slate-400 hover:bg-slate-100'}` }, [
-                            h('i', { 'data-lucide': 'star', class: 'w-5 h-5' }), h('span', { class: 'hidden md:inline font-semibold' }, "Special Vault")
-                        ])
+                        h('button', { onClick: () => setActiveTab('daily'), class: `w-full p-4 rounded-2xl flex items-center gap-3 ${activeTab === 'daily' ? 'bg-blue-50 text-blue-600' : 'text-slate-400'}` }, [h('i', { 'data-lucide': 'book-open' }), h('span', { class: 'hidden md:block font-bold' }, "Daily Logs")]),
+                        h('button', { onClick: () => setActiveTab('tasks'), class: `w-full p-4 rounded-2xl flex items-center gap-3 ${activeTab === 'tasks' ? 'bg-emerald-50 text-emerald-600' : 'text-slate-400'}` }, [h('i', { 'data-lucide': 'check-square' }), h('span', { class: 'hidden md:block font-bold' }, "Tasks")]),
+                        h('button', { onClick: () => setActiveTab('vault'), class: `w-full p-4 rounded-2xl flex items-center gap-3 ${activeTab === 'vault' ? 'bg-purple-50 text-purple-600' : 'text-slate-400'}` }, [h('i', { 'data-lucide': 'star' }), h('span', { class: 'hidden md:block font-bold' }, "Special Vault")])
                     ]),
                     h('div', { class: 'p-4 border-t' }, [
-                        h('button', { onClick: () => setShowLogin(true), class: 'w-full text-left p-2 bg-slate-50 rounded-lg text-[10px] font-mono truncate text-slate-400 hover:text-indigo-600' }, currentId)
+                        h('button', { onClick: () => setShowSync(true), class: 'text-[10px] font-mono text-slate-400 truncate w-full hover:text-blue-600' }, currentUid)
                     ])
                 ]),
 
-                // Main Content
-                h('main', { class: 'flex-1 p-6 md:p-12 max-w-6xl' }, [
-                    h('header', { class: 'flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8' }, [
+                // Content
+                h('main', { class: 'flex-1 p-6 md:p-12 overflow-y-auto' }, [
+                    h('div', { class: 'flex justify-between items-center mb-8' }, [
                         h('div', {}, [
-                            h('h1', { class: 'text-3xl font-black text-slate-800' }, 
-                                activeTab === 'daily' ? 'Stories & Logs' : activeTab === 'tasks' ? 'Daily Goals' : 'Special Vault'),
-                            h('p', { class: 'text-slate-400 text-sm' }, `Your personal ${activeTab === 'vault' ? 'special memories' : 'dashboard'}.`)
+                            h('h2', { class: 'text-3xl font-black text-slate-800 uppercase' }, activeTab),
+                            h('p', { class: 'text-slate-400 font-medium' }, "Syncing to your private cloud.")
                         ]),
-                        h('button', { onClick: () => addItem(activeTab === 'daily' ? 'entry' : activeTab === 'tasks' ? 'task' : 'vault'), class: 'bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-indigo-700 transition active:scale-95' }, "+ Add New")
+                        h('button', { onClick: addNew, class: 'bg-slate-900 text-white px-6 py-3 rounded-2xl font-bold shadow-xl hover:bg-black transition' }, "+ Add Entry")
                     ]),
 
-                    activeTab === 'daily' && h('div', { class: 'grid gap-4' }, entries.map(e => 
-                        h('div', { class: 'bg-white p-6 rounded-2xl shadow-sm border border-slate-100 group relative' }, [
-                            h('div', { class: 'text-[10px] font-black text-slate-300 uppercase mb-1' }, e.date),
-                            h('h3', { class: 'text-xl font-bold mb-2 text-slate-800' }, e.title),
-                            h('p', { class: 'text-slate-500 leading-relaxed' }, e.content),
-                            h('button', { onClick: () => deleteItem('entries', e.id), class: 'absolute top-6 right-6 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
-                        ])
-                    )),
+                    activeTab === 'daily' && h('div', { class: 'space-y-4' }, entries.map(e => h('div', { class: 'bg-white p-6 rounded-3xl border border-slate-100 relative group' }, [
+                        h('span', { class: 'text-[10px] font-bold text-slate-300 uppercase' }, e.date),
+                        h('h3', { class: 'text-xl font-bold text-slate-800' }, e.title),
+                        h('p', { class: 'text-slate-500 mt-2' }, e.content),
+                        h('button', { onClick: () => remove('entries', e.id), class: 'absolute top-6 right-6 opacity-0 group-hover:opacity-100 text-red-400' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
+                    ]))),
 
-                    activeTab === 'tasks' && h('div', { class: 'bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden' }, tasks.map(t => 
-                        h('div', { class: 'flex items-center gap-4 p-5 border-b last:border-0 hover:bg-slate-50 transition-colors' }, [
-                            h('input', { type: 'checkbox', checked: t.completed, onChange: () => toggleTask(t.id), class: 'w-6 h-6 rounded-full border-slate-200 text-indigo-600' }),
-                            h('span', { class: `flex-1 font-bold ${t.completed ? 'line-through text-slate-300' : 'text-slate-700'}` }, t.text),
-                            h('button', { onClick: () => deleteItem('tasks', t.id), class: 'text-slate-200 hover:text-red-400' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
-                        ])
-                    )),
+                    activeTab === 'tasks' && h('div', { class: 'bg-white rounded-3xl overflow-hidden' }, tasks.map(t => h('div', { class: 'p-5 flex items-center gap-4 border-b last:border-0' }, [
+                        h('input', { type: 'checkbox', checked: t.completed, onChange: () => toggleTask(t.id), class: 'w-5 h-5 accent-emerald-500' }),
+                        h('span', { class: `flex-1 font-bold ${t.completed ? 'line-through text-slate-300' : 'text-slate-700'}` }, t.text),
+                        h('button', { onClick: () => remove('tasks', t.id), class: 'text-slate-200 hover:text-red-400' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
+                    ]))),
 
-                    activeTab === 'vault' && h('div', { class: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' }, vault.map(v => 
-                        h('div', { class: 'bg-white rounded-3xl p-6 shadow-sm border border-slate-100 group relative hover:shadow-md transition-all' }, [
-                            h('div', { class: 'flex items-center justify-between mb-4' }, [
-                                h('span', { class: `text-[10px] font-black px-3 py-1 rounded-full uppercase ${v.category === 'Person' ? 'bg-purple-100 text-purple-600' : 'bg-orange-100 text-orange-600'}` }, v.category),
-                                h('button', { onClick: () => deleteItem('vault', v.id), class: 'opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
-                            ]),
-                            h('h3', { class: 'text-lg font-bold text-slate-800 mb-1' }, v.name),
-                            h('p', { class: 'text-xs text-slate-400 mb-4' }, v.date),
-                            h('p', { class: 'text-sm text-slate-500 leading-relaxed italic' }, v.details)
-                        ])
-                    )),
+                    activeTab === 'vault' && h('div', { class: 'grid md:grid-cols-2 lg:grid-cols-3 gap-6' }, vault.map(v => h('div', { class: 'bg-white p-6 rounded-3xl border border-slate-100 hover:shadow-lg transition' }, [
+                        h('div', { class: 'flex justify-between mb-2' }, [
+                            h('span', { class: 'px-2 py-1 bg-purple-100 text-purple-600 text-[9px] font-black rounded-lg uppercase' }, v.category),
+                            h('button', { onClick: () => remove('vault', v.id), class: 'text-slate-200 hover:text-red-400' }, h('i', { 'data-lucide': 'trash-2', class: 'w-4 h-4' }))
+                        ]),
+                        h('h3', { class: 'font-bold text-slate-800' }, v.name),
+                        h('p', { class: 'text-xs text-slate-400' }, v.date),
+                        h('p', { class: 'text-sm text-slate-500 mt-3 italic' }, v.details)
+                    ]))),
 
-                    showLogin && h('div', { class: 'fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50' }, [
-                        h('div', { class: 'bg-white p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl' }, [
-                            h('h2', { class: 'text-2xl font-black mb-2 text-slate-800 text-center' }, "Sync Account"),
-                            h('p', { class: 'text-slate-400 mb-6 text-sm text-center' }, "Paste your Cloud ID to load your data."),
-                            h('form', { onSubmit: (e) => { e.preventDefault(); localStorage.setItem('diary_uid', loginId.trim()); window.location.reload(); }, class: 'space-y-4' }, [
-                                h('input', { class: 'w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-mono text-xs focus:ring-2 focus:ring-indigo-500', placeholder: 'Cloud ID...', value: loginId, onInput: (e) => setLoginId(e.target.value) }),
-                                h('button', { class: 'w-full bg-indigo-600 text-white p-4 rounded-2xl font-black shadow-lg shadow-indigo-100' }, "Sync Now"),
-                                h('button', { type: 'button', onClick: () => { localStorage.removeItem('diary_uid'); window.location.reload(); }, class: 'w-full text-[10px] text-red-400 font-bold uppercase' }, "Disconnect / Reset"),
-                                h('button', { type: 'button', onClick: () => setShowLogin(false), class: 'w-full text-slate-300 font-bold text-sm' }, "Cancel")
-                            ])
-                        ])
-                    ])
+                    // Sync UI
+                    showSync && h('div', { class: 'fixed inset-0 bg-white/80 backdrop-blur-md flex items-center justify-center p-6 z-50' }, h('div', { class: 'max-w-xs w-full text-center' }, [
+                        h('h2', { class: 'text-xl font-bold mb-4' }, "Cloud Sync"),
+                        h('input', { placeholder: "Paste User ID", value: syncInput, onInput: (e) => setSyncInput(e.target.value), class: 'w-full p-4 rounded-2xl bg-slate-100 mb-4 border-0 font-mono text-xs' }),
+                        h('button', { onClick: () => { localStorage.setItem('diary_uid', syncInput); window.location.reload(); }, class: 'w-full bg-blue-600 text-white p-4 rounded-2xl font-bold mb-2' }, "Connect Account"),
+                        h('button', { onClick: () => setShowSync(false), class: 'text-slate-400 text-sm' }, "Cancel")
+                    ]))
                 ])
             ]);
         }
 
         render(h(App), document.body);
-        setInterval(() => lucide.createIcons(), 300);
+        setInterval(() => lucide.createIcons(), 500);
     </script>
-    <style>
-        body { margin: 0; scroll-behavior: smooth; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
-    </style>
 </head>
-<body></body>
+<body class="bg-slate-50"></body>
 </html>
