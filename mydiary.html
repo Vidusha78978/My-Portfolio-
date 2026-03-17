@@ -16,13 +16,22 @@
         import { h, render, Component } from 'https://esm.sh/preact';
         import { useState, useEffect, useMemo } from 'https://esm.sh/preact/hooks';
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
+        // --- DYNAMIC CONFIGURATION ---
+        let firebaseConfig;
+        let isConfigured = false;
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+                isConfigured = true;
+            } else {
+                // Fallback for local testing (User would need to fill this to work locally)
+                firebaseConfig = { apiKey: "", authDomain: "", projectId: "", storageBucket: "", messagingSenderId: "", appId: "" };
+            }
+        } catch (e) {
+            console.error("Config error", e);
+        }
+
         const APP_ID = typeof __app_id !== 'undefined' ? __app_id : "diary-app-v1";
 
         function App() {
@@ -33,8 +42,18 @@
             const [vault, setVault] = useState([]);
             const [showLogin, setShowLogin] = useState(false);
             const [loginId, setLoginId] = useState('');
+            const [error, setError] = useState(null);
 
             useEffect(() => {
+                if (!isConfigured) {
+                    setError("Firebase configuration missing. Please use the 'Preview' button in the editor to run this app correctly.");
+                    return;
+                }
+
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+
                 const initAuth = async () => {
                     try {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -42,26 +61,37 @@
                         } else {
                             await signInAnonymously(auth);
                         }
-                    } catch (e) { console.error(e); }
+                    } catch (e) { 
+                        setError("Connection Error: Make sure you are clicking 'Preview' to start the app session.");
+                    }
                 };
+                
                 initAuth();
-                const unsubscribe = onAuthStateChanged(auth, (u) => setUser(u));
-                return () => unsubscribe();
+                const unsubscribeAuth = onAuthStateChanged(auth, (u) => setUser(u));
+
+                return () => unsubscribeAuth();
             }, []);
 
             useEffect(() => {
-                if (!user) return;
+                if (!user || !isConfigured) return;
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
                 const uid = localStorage.getItem('diary_uid') || user.uid;
 
-                const unsubEntries = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'entries'), (s) => setEntries(s.data()?.list || []));
-                const unsubTasks = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'tasks'), (s) => setTasks(s.data()?.list || []));
-                const unsubVault = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'vault'), (s) => setVault(s.data()?.list || []));
+                const unsubEntries = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'entries'), 
+                    (s) => setEntries(s.data()?.list || []), (e) => console.error(e));
+                const unsubTasks = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'tasks'), 
+                    (s) => setTasks(s.data()?.list || []), (e) => console.error(e));
+                const unsubVault = onSnapshot(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', 'vault'), 
+                    (s) => setVault(s.data()?.list || []), (e) => console.error(e));
 
                 return () => { unsubEntries(); unsubTasks(); unsubVault(); };
             }, [user]);
 
             const persist = async (key, list) => {
                 if (!user) return;
+                const app = initializeApp(firebaseConfig);
+                const db = getFirestore(app);
                 const uid = localStorage.getItem('diary_uid') || user.uid;
                 await setDoc(doc(db, 'artifacts', APP_ID, 'users', uid, 'data', key), { list });
             };
@@ -99,13 +129,18 @@
                 persist(key, newList);
             };
 
-            const handleSync = (e) => {
-                e.preventDefault();
-                localStorage.setItem('diary_uid', loginId.trim());
-                window.location.reload();
-            };
+            if (error) {
+                return h('div', { class: 'min-h-screen flex items-center justify-center bg-slate-100 p-4' }, [
+                    h('div', { class: 'bg-white p-8 rounded-3xl shadow-xl max-w-md text-center' }, [
+                        h('div', { class: 'bg-red-50 text-red-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4' }, h('i', { 'data-lucide': 'alert-circle' })),
+                        h('h2', { class: 'text-xl font-bold mb-2' }, "Configuration Required"),
+                        h('p', { class: 'text-slate-500 mb-6 text-sm' }, error),
+                        h('button', { onClick: () => window.location.reload(), class: 'bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold' }, "Retry")
+                    ])
+                ]);
+            }
 
-            const currentId = localStorage.getItem('diary_uid') || (user ? user.uid : '...');
+            const currentId = localStorage.getItem('diary_uid') || (user ? user.uid : 'Connecting...');
 
             return h('div', { class: 'min-h-screen bg-slate-50 flex font-sans text-slate-900' }, [
                 // Sidebar
@@ -133,7 +168,7 @@
                         h('div', {}, [
                             h('h1', { class: 'text-3xl font-black text-slate-800' }, 
                                 activeTab === 'daily' ? 'Stories & Logs' : activeTab === 'tasks' ? 'Daily Goals' : 'Special Vault'),
-                            h('p', { class: 'text-slate-400 text-sm' }, `Keep track of your most important ${activeTab === 'vault' ? 'people and memories' : 'daily updates'}.`)
+                            h('p', { class: 'text-slate-400 text-sm' }, `Your personal ${activeTab === 'vault' ? 'special memories' : 'dashboard'}.`)
                         ]),
                         h('button', { onClick: () => addItem(activeTab === 'daily' ? 'entry' : activeTab === 'tasks' ? 'task' : 'vault'), class: 'bg-indigo-600 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-indigo-700 transition active:scale-95' }, "+ Add New")
                     ]),
@@ -167,12 +202,11 @@
                         ])
                     )),
 
-                    // Sync Modal
                     showLogin && h('div', { class: 'fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50' }, [
                         h('div', { class: 'bg-white p-8 rounded-[2.5rem] w-full max-w-sm shadow-2xl' }, [
                             h('h2', { class: 'text-2xl font-black mb-2 text-slate-800 text-center' }, "Sync Account"),
-                            h('p', { class: 'text-slate-400 mb-6 text-sm text-center' }, "Paste your Cloud ID to load your data on this device."),
-                            h('form', { onSubmit: handleSync, class: 'space-y-4' }, [
+                            h('p', { class: 'text-slate-400 mb-6 text-sm text-center' }, "Paste your Cloud ID to load your data."),
+                            h('form', { onSubmit: (e) => { e.preventDefault(); localStorage.setItem('diary_uid', loginId.trim()); window.location.reload(); }, class: 'space-y-4' }, [
                                 h('input', { class: 'w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl outline-none font-mono text-xs focus:ring-2 focus:ring-indigo-500', placeholder: 'Cloud ID...', value: loginId, onInput: (e) => setLoginId(e.target.value) }),
                                 h('button', { class: 'w-full bg-indigo-600 text-white p-4 rounded-2xl font-black shadow-lg shadow-indigo-100' }, "Sync Now"),
                                 h('button', { type: 'button', onClick: () => { localStorage.removeItem('diary_uid'); window.location.reload(); }, class: 'w-full text-[10px] text-red-400 font-bold uppercase' }, "Disconnect / Reset"),
