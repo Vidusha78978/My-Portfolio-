@@ -47,63 +47,68 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        .redirect-notice {
-            position: absolute;
-            bottom: 2rem;
+        .entering-text {
+            margin-top: 2rem;
             font-size: 0.875rem;
             color: #64748b;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Greeting Overlay -->
     <div id="greeting-overlay">
         <div class="text-center px-6 animate-up">
             <h1 id="time-greeting" class="text-4xl md:text-6xl font-light mb-2">Hello,</h1>
-            <h2 id="user-identity" class="text-3xl md:text-5xl font-bold text-gradient mb-8">Detecting...</h2>
+            <h2 id="user-identity" class="text-3xl md:text-5xl font-bold text-gradient mb-8">Identifying...</h2>
             
-            <!-- Visual loader -->
             <div id="loading-bar" class="w-48 h-1 bg-gray-700 mx-auto rounded-full overflow-hidden">
-                <div class="h-full bg-blue-500 w-0 transition-all duration-1000 ease-in-out" id="progress"></div>
+                <div class="h-full bg-blue-500 w-0 transition-all duration-1500 ease-in-out" id="progress"></div>
             </div>
-        </div>
 
-        <p class="redirect-notice animate-pulse">Entering Portfolio...</p>
+            <div class="entering-text">Entering Portfolio</div>
+        </div>
     </div>
 
     <script>
         /**
-         * 1. IDENTIFY USER LOGIC
+         * METHOD FOR IDENTIFYING USER
+         * Priority: URL Param > LocalStorage > Browser Fingerprint
          */
         function getIdentity() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
-                const emailParam = urlParams.get('email');
-                const nameParam = urlParams.get('name');
-                const storedIdentity = localStorage.getItem('user_id');
-
-                if (emailParam) {
-                    localStorage.setItem('user_id', emailParam);
-                    return emailParam;
-                } 
+                const nameParam = urlParams.get('name') || urlParams.get('email');
                 
+                // 1. Check URL Parameters first
                 if (nameParam) {
                     localStorage.setItem('user_id', nameParam);
                     return nameParam;
-                }
+                } 
 
-                return storedIdentity || "Guest";
+                // 2. Check LocalStorage for returning users
+                const storedIdentity = localStorage.getItem('user_id');
+                if (storedIdentity) return storedIdentity;
+
+                // 3. Browser Fingerprinting Fallback
+                const fingerPrint = (window.screen.width + window.screen.height + navigator.language.length).toString();
+                const randomId = "User-" + fingerPrint;
+                
+                localStorage.setItem('user_id', randomId);
+                return randomId;
+
             } catch (e) {
-                console.warn("Identity check failed:", e);
-                return "Guest";
+                return "Visitor";
             }
         }
 
-        /**
-         * 2. TIME GREETING LOGIC
-         */
         function getTimeGreeting() {
             const hour = new Date().getHours();
             if (hour < 12) return "Good Morning,";
@@ -111,39 +116,31 @@
             return "Good Evening,";
         }
 
-        /**
-         * 3. INITIALIZATION & REDIRECT
-         */
         function init() {
             const timeGreetingEl = document.getElementById('time-greeting');
             const userIdEl = document.getElementById('user-identity');
             const progress = document.getElementById('progress');
 
-            // Apply Greetings
             const identity = getIdentity();
             timeGreetingEl.textContent = getTimeGreeting();
             userIdEl.textContent = identity;
 
-            // Start progress bar animation
             setTimeout(() => { 
                 if (progress) progress.style.width = '100%'; 
             }, 100);
 
-            // Redirect to home.html after 3 seconds
+            // Redirection logic
             setTimeout(() => {
+                const target = "home.html";
                 try {
-                    // Use window.location.href directly for better compatibility
-                    // Adding ./ ensures it's treated as a relative path if supported
-                    window.location.href = "./home.html";
+                    window.location.href = target;
                 } catch (err) {
-                    console.error("Redirection error:", err);
-                    // Fallback attempt
-                    window.location.assign("home.html");
+                    console.error("Redirection failed:", err);
+                    window.location.assign(target);
                 }
-            }, 3000);
+            }, 2800);
         }
 
-        // Wait for DOM to be ready
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
