@@ -10,9 +10,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Load Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Load Tone.js for ambient music -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-    
     <!-- Import Playfair Display from Google Fonts for a professional headline style -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 
@@ -271,6 +268,8 @@
         </div>
     </div>
     <!-- END Welcome Greeting Modal -->
+
+    <audio id="background-audio" src="back.mp3" loop preload="auto"></audio>
 
     <!-- Ambient Music Toggle Button (Click this to start the music!) -->
     <button id="musicToggle" class="fixed bottom-4 right-4 z-50 p-3 rounded-full bg-accent-purple text-white shadow-lg transition duration-300 hover:bg-violet-600 focus:outline-none focus:ring-4 focus:ring-violet-300 transform hover:scale-105" aria-label="Toggle ambient music">
@@ -908,62 +907,52 @@
             } catch (e) { console.error("IntersectionObserver failed:", e); }
 
 
-            // --- AMBIENT MUSIC LOGIC ---
+            // --- BACKGROUND MUSIC LOGIC ---
             try {
                 const musicToggle = document.getElementById('musicToggle');
                 const musicIcon = document.getElementById('musicIcon');
-                if (musicToggle && musicIcon) {
+                const backgroundAudio = document.getElementById('background-audio');
+
+                if (musicToggle && musicIcon && backgroundAudio) {
                     let musicPlaying = false;
-                    let synth;
+                    backgroundAudio.volume = 0.25;
 
-                    const startAmbientMusic = async () => {
-                        await Tone.start();
-
-                        if (!synth) {
-                            synth = new Tone.PolySynth(Tone.FMSynth, {
-                                harmonicity: 1.5,
-                                modulationIndex: 10,
-                                envelope: { attack: 2, decay: 1, sustain: 1, release: 4 },
-                                modulation: { type: "sine" },
-                                modulationEnvelope: { attack: 2, decay: 0.01, sustain: 1, release: 2 }
-                            }).toDestination();
-                            synth.volume.value = 30; // Louder background music
-
-                            Tone.Transport.scheduleRepeat(time => {
-                                synth.triggerAttackRelease("G2", "4n", time);
-                                synth.triggerAttackRelease("Bb2", "4n", time + 1);
-                                synth.triggerAttackRelease("D3", "4n", time + 2);
-                                synth.triggerAttackRelease("F3", "4n", time + 3);
-                            }, "4m");
-                        }
-
-                        if (!musicPlaying) {
-                            Tone.Transport.start();
-                            musicPlaying = true;
+                    const updateMusicIcon = () => {
+                        if (musicPlaying) {
                             musicIcon.classList.remove('fa-volume-mute');
                             musicIcon.classList.add('fa-volume-up');
+                        } else {
+                            musicIcon.classList.remove('fa-volume-up');
+                            musicIcon.classList.add('fa-volume-mute');
                         }
                     };
 
-                    const stopAmbientMusic = () => {
-                        Tone.Transport.stop();
+                    const startBackgroundMusic = async () => {
+                        try {
+                            await backgroundAudio.play();
+                            musicPlaying = true;
+                            updateMusicIcon();
+                        } catch (e) {
+                            console.warn('Audio playback blocked until user interaction:', e);
+                        }
+                    };
+
+                    const pauseBackgroundMusic = () => {
+                        backgroundAudio.pause();
                         musicPlaying = false;
-                        musicIcon.classList.remove('fa-volume-up');
-                        musicIcon.classList.add('fa-volume-mute');
+                        updateMusicIcon();
                     };
 
                     musicToggle.addEventListener('click', async () => {
                         try {
                             if (!musicPlaying) {
-                                await startAmbientMusic();
+                                await startBackgroundMusic();
                             } else {
-                                stopAmbientMusic();
+                                pauseBackgroundMusic();
                             }
-                        } catch (e) { console.error("Tone.js error:", e); }
-                    });
-
-                    startAmbientMusic().catch(e => {
-                        console.warn("Autoplay blocked by browser, user interaction is required to start audio.", e);
+                        } catch (e) {
+                            console.error('Music toggle failed:', e);
+                        }
                     });
                 }
             } catch (e) { console.error("Music toggle setup failed:", e); }
