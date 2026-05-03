@@ -927,7 +927,7 @@
                                 modulation: { type: "sine" },
                                 modulationEnvelope: { attack: 2, decay: 0.01, sustain: 1, release: 2 }
                             }).toDestination();
-                            synth.volume.value = -2; // Louder background music
+                            synth.volume.value = 30; // Louder background music
 
                             Tone.Transport.scheduleRepeat(time => {
                                 synth.triggerAttackRelease("G2", "4n", time);
