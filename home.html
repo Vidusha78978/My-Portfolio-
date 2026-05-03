@@ -916,57 +916,42 @@
                     let musicPlaying = false;
                     let synth;
 
-                    const startAmbientMusic = async () => {
-                        await Tone.start();
-
-                        if (!synth) {
-                            synth = new Tone.PolySynth(Tone.FMSynth, {
-                                harmonicity: 1.5,
-                                modulationIndex: 10,
-                                envelope: { attack: 2, decay: 1, sustain: 1, release: 4 },
-                                modulation: { type: "sine" },
-                                modulationEnvelope: { attack: 2, decay: 0.01, sustain: 1, release: 2 }
-                            }).toDestination();
-                            synth.volume.value = -6; // Medium audible level
-
-                            Tone.Transport.scheduleRepeat(time => {
-                                synth.triggerAttackRelease("G2", "4n", time);
-                                synth.triggerAttackRelease("Bb2", "4n", time + 1);
-                                synth.triggerAttackRelease("D3", "4n", time + 2);
-                                synth.triggerAttackRelease("F3", "4n", time + 3);
-                            }, "4m");
-                        }
-
-                        if (!musicPlaying) {
-                            Tone.Transport.start();
-                            musicPlaying = true;
-                            musicIcon.classList.remove('fa-volume-mute');
-                            musicIcon.classList.add('fa-volume-up');
-                        }
-                    };
-
-                    const stopAmbientMusic = () => {
-                        Tone.Transport.stop();
-                        musicPlaying = false;
-                        musicIcon.classList.remove('fa-volume-up');
-                        musicIcon.classList.add('fa-volume-mute');
-                    };
-
                     musicToggle.addEventListener('click', async () => {
                         try {
+                            await Tone.start();
+                        
+                            if (!synth) {
+                                synth = new Tone.PolySynth(Tone.FMSynth, {
+                                    harmonicity: 1.5,
+                                    modulationIndex: 10,
+                                    envelope: { attack: 2, decay: 1, sustain: 1, release: 4 },
+                                    modulation: { type: "sine" },
+                                    modulationEnvelope: { attack: 2, decay: 0.01, sustain: 1, release: 2 }
+                                }).toDestination();
+                                synth.volume.value = 30; // Increase background music volume
+                            }
+
                             if (!musicPlaying) {
-                                await startAmbientMusic();
+                                Tone.Transport.scheduleRepeat(time => {
+                                    synth.triggerAttackRelease("G2", "4n", time);
+                                    synth.triggerAttackRelease("Bb2", "4n", time + 1);
+                                    synth.triggerAttackRelease("D3", "4n", time + 2);
+                                    synth.triggerAttackRelease("F3", "4n", time + 3);
+                                }, "4m");
+                                
+                                Tone.Transport.start();
+                                musicPlaying = true;
+                                musicIcon.classList.remove('fa-volume-mute');
+                                musicIcon.classList.add('fa-volume-up');
                             } else {
-                                stopAmbientMusic();
+                                Tone.Transport.stop();
+                                Tone.Transport.cancel(); // Clear scheduled events
+                                musicPlaying = false;
+                                musicIcon.classList.remove('fa-volume-up');
+                                musicIcon.classList.add('fa-volume-mute');
                             }
                         } catch (e) { console.error("Tone.js error:", e); }
                     });
-
-                    startAmbientMusic().catch(e => {
-                        console.warn("Autoplay blocked, user interaction is required to start audio.", e);
-                    });
-                }
-            } catch (e) { console.error("Music toggle setup failed:", e); }
                 }
             } catch (e) { console.error("Music toggle setup failed:", e); }
 
