@@ -269,7 +269,7 @@
     </div>
     <!-- END Welcome Greeting Modal -->
 
-    <audio id="background-audio" src="back.mp3" loop preload="auto"></audio>
+    <audio id="background-audio" src="back.mp3" loop preload="auto" autoplay></audio>
 
     <!-- Ambient Music Toggle Button (Click this to start the music!) -->
     <button id="musicToggle" class="fixed bottom-4 right-4 z-50 p-3 rounded-full bg-accent-purple text-white shadow-lg transition duration-300 hover:bg-violet-600 focus:outline-none focus:ring-4 focus:ring-violet-300 transform hover:scale-105" aria-label="Toggle ambient music">
@@ -927,26 +927,44 @@
                         }
                     };
 
-                    const startBackgroundMusic = async () => {
+                    backgroundAudio.addEventListener('play', () => {
+                        musicPlaying = true;
+                        updateMusicIcon();
+                    });
+
+                    backgroundAudio.addEventListener('pause', () => {
+                        musicPlaying = false;
+                        updateMusicIcon();
+                    });
+
+                    const tryPlayAudio = async () => {
                         try {
                             await backgroundAudio.play();
-                            musicPlaying = true;
-                            updateMusicIcon();
                         } catch (e) {
-                            console.warn('Audio playback blocked until user interaction:', e);
+                            console.warn('Audio autoplay blocked until user interaction:', e);
                         }
                     };
 
+                    const resumeAudioOnGesture = async () => {
+                        if (musicPlaying) return;
+                        try {
+                            await backgroundAudio.play();
+                        } catch (e) {
+                            console.warn('Audio resume blocked:', e);
+                        }
+                    };
+
+                    window.addEventListener('pointerdown', resumeAudioOnGesture, { once: true });
+                    window.addEventListener('keydown', resumeAudioOnGesture, { once: true });
+
                     const pauseBackgroundMusic = () => {
                         backgroundAudio.pause();
-                        musicPlaying = false;
-                        updateMusicIcon();
                     };
 
                     musicToggle.addEventListener('click', async () => {
                         try {
                             if (!musicPlaying) {
-                                await startBackgroundMusic();
+                                await backgroundAudio.play();
                             } else {
                                 pauseBackgroundMusic();
                             }
@@ -954,6 +972,8 @@
                             console.error('Music toggle failed:', e);
                         }
                     });
+
+                    tryPlayAudio();
                 }
             } catch (e) { console.error("Music toggle setup failed:", e); }
 
