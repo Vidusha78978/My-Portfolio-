@@ -598,7 +598,7 @@
         <section class="hero container" id="home">
             <div class="hero-grid">
                 <div>
-                    <p class="eyebrow">Developer &amp; IT undergraduate</p>
+                    <p class="eyebrow">Full-Stack Developer &amp; WordPress Developer</p>
                     <h1>Building thoughtful <span>digital experiences.</span></h1>
                     <p class="hero-lede">I'm Vidusha, a full-stack and WordPress developer from Sri Lanka. I build responsive websites, e-commerce stores, and learning platforms, with a focus on making technology useful and easy to use.</p>
                     <div class="hero-actions">
@@ -972,7 +972,7 @@
         const emailJsConfig = {
             publicKey: "eEj3j4RTyiXNgBTX-",
             serviceId: "service_t86mg1r",
-            templateId: "template_k63s9qg"
+            templateId: "template_a6g37ba"
         };
         const musicToggle = document.getElementById("music-toggle");
         const backgroundMusic = document.getElementById("background-music");
@@ -1020,9 +1020,19 @@
             } catch (error) {
                 console.error("Message delivery failed:", error);
                 messageStatus.dataset.state = "error";
-                messageStatus.textContent = error instanceof Error
-                    ? `${error.message} You can also email me at vidushachathuranga78978@gmail.com.`
-                    : "Your message could not be sent. Please try again or email me directly.";
+                const errorMessage = typeof error === "string"
+                    ? error
+                    : error instanceof Error
+                        ? error.message
+                        : error && typeof error === "object" && typeof error.text === "string"
+                            ? error.text
+                            : "Your message could not be sent. Please try again.";
+                const errorStatus = error && typeof error === "object" && typeof error.status === "number"
+                    ? ` (Error ${error.status})`
+                    : "";
+                messageStatus.textContent = errorMessage
+                    + errorStatus
+                    + " You can also email me at vidushachathuranga78978@gmail.com.";
             } finally {
                 messageSubmit.disabled = false;
                 messageSubmit.textContent = "Send message";
