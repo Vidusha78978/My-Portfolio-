@@ -3,183 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome page</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="theme-color" id="theme-color" content="#f8f1df">
+    <meta name="description" content="Welcome to Vidusha Chathuranga's portfolio.">
+    <title>Welcome | Vidusha Chathuranga</title>
+    <link rel="canonical" href="home.html">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
-        
+        :root {
+            color-scheme: light;
+            --sky-top: #f8f1df;
+            --sky-bottom: #f5e5c8;
+            --ink: #27352f;
+            --muted: #64716a;
+            --accent: #ad7042;
+            --orb: #edaa5d;
+            --orb-glow: rgba(240, 170, 82, .26);
+            --card: rgba(255, 255, 255, .67);
+            --line: rgba(113, 91, 62, .14);
+            --progress: #bd8051;
+        }
+        * { box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: white;
+            min-height: 100vh;
+            min-height: 100svh;
+            display: grid;
             margin: 0;
+            padding: 24px;
+            place-items: center;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            background: linear-gradient(155deg, var(--sky-top), var(--sky-bottom));
+            color: var(--ink);
+            font-family: "Segoe UI", Arial, sans-serif;
+            transition: background 900ms ease, color 500ms ease;
         }
-
-        #greeting-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            transition: opacity 0.8s ease-out;
+        body[data-period="afternoon"] {
+            --sky-top: #e5f3f4;
+            --sky-bottom: #d8e8ed;
+            --ink: #21363c;
+            --muted: #5f7479;
+            --accent: #33788a;
+            --orb: #f4c55e;
+            --orb-glow: rgba(244, 197, 94, .27);
+            --card: rgba(255, 255, 255, .68);
+            --line: rgba(49, 96, 105, .15);
+            --progress: #478a96;
         }
-
-        .text-gradient {
-            background: linear-gradient(to right, #60a5fa, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        body[data-period="night"] {
+            color-scheme: dark;
+            --sky-top: #17253a;
+            --sky-bottom: #29384c;
+            --ink: #f2f3ed;
+            --muted: #b8c3ca;
+            --accent: #c6b3ec;
+            --orb: #eee8c7;
+            --orb-glow: rgba(218, 222, 244, .16);
+            --card: rgba(17, 29, 46, .44);
+            --line: rgba(230, 235, 240, .13);
+            --progress: #b8a3e6;
         }
-
-        .animate-up {
-            animation: slideUp 0.8s ease-out forwards;
+        .welcome {
+            position: relative;
+            width: min(100%, 500px);
+            padding: 34px clamp(22px, 7vw, 48px) 29px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: var(--card);
+            box-shadow: 0 28px 90px rgba(32, 49, 48, .12);
+            text-align: center;
+            backdrop-filter: blur(14px);
+            animation: arrive 850ms cubic-bezier(.2,.75,.25,1) both;
         }
-
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .sky {
+            position: relative;
+            height: 188px;
+            display: grid;
+            margin: -2px auto 12px;
+            place-items: center;
+            isolation: isolate;
         }
-
-        .redirect-notice {
+        .sky::before {
             position: absolute;
-            bottom: 2rem;
-            font-size: 0.875rem;
-            color: #64748b;
-            letter-spacing: 0.05em;
+            z-index: -1;
+            width: 158px;
+            height: 158px;
+            border-radius: 50%;
+            background: var(--orb-glow);
+            content: "";
+            animation: glow 4s ease-in-out infinite;
         }
-
-        /* Sticker Container */
-        .sticker-container {
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: center;
+        .sun {
+            position: absolute;
+            width: 86px;
+            height: 86px;
+            color: var(--orb);
+            filter: drop-shadow(0 0 22px var(--orb-glow));
+            animation: sun-rise 1.5s cubic-bezier(.2,.75,.25,1) both, float 5s ease-in-out 1.5s infinite;
+        }
+        .sun-core { fill: currentColor; }
+        .sun-rays {
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-width: 4;
+            transform-origin: 60px 60px;
+            animation: rotate 28s linear infinite;
+        }
+        .landscape {
+            position: absolute;
+            right: 0;
+            bottom: 9px;
+            left: 0;
+            width: 100%;
+            height: 72px;
+            overflow: visible;
+        }
+        .landscape .back-hill { fill: var(--orb-glow); }
+        .landscape .front-hill { fill: var(--card); stroke: var(--line); stroke-width: 1.5; }
+        .moon {
+            position: absolute;
+            top: 34px;
+            left: calc(50% - 38px);
+            display: none;
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: var(--orb);
+            box-shadow: 0 0 38px var(--orb-glow);
+            animation: moon-enter 1s cubic-bezier(.2,.75,.25,1) both, float 5s ease-in-out 1s infinite;
+        }
+        .moon::after {
+            position: absolute;
+            top: -10px;
+            left: 22px;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--sky-top);
+            content: "";
+            transition: background 900ms ease;
+        }
+        .stars { position: absolute; inset: 5px 16px 30px; display: none; }
+        .star {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #f6e8bb;
+            animation: twinkle 2.1s ease-in-out infinite alternate;
+        }
+        .star:nth-child(1) { top: 22%; left: 14%; }
+        .star:nth-child(2) { top: 42%; left: 82%; width: 4px; height: 4px; animation-delay: .6s; }
+        .star:nth-child(3) { top: 5%; left: 70%; width: 6px; height: 6px; animation-delay: 1.1s; }
+        .star:nth-child(4) { top: 60%; left: 23%; width: 3px; height: 3px; animation-delay: 1.5s; }
+        .star:nth-child(5) { top: 19%; left: 35%; width: 3px; height: 3px; animation-delay: .9s; }
+        body[data-period="night"] .sun { display: none; }
+        body[data-period="night"] .moon,
+        body[data-period="night"] .stars { display: block; }
+        body[data-period="afternoon"] .sun { animation-name: sun-noon, float; }
+        .greeting {
+            margin: 0;
+            font-size: .76rem;
+            font-weight: 700;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            animation: fade-up 700ms 180ms both;
+        }
+        h1 {
+            margin: 12px 0 9px;
+            font-size: clamp(2.35rem, 9vw, 3.5rem);
+            font-weight: 750;
+            letter-spacing: -.065em;
+            line-height: 1.08;
+            animation: fade-up 750ms 300ms both;
+        }
+        .intro {
+            margin: 0;
+            color: var(--muted);
+            font-size: 1rem;
+            line-height: 1.65;
+            animation: fade-up 750ms 430ms both;
+        }
+        .enter {
+            min-height: 48px;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 26px;
+            padding: 11px 19px;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: var(--ink);
+            color: var(--sky-top);
+            font-size: .93rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: opacity 160ms ease, transform 160ms ease, background 300ms ease, color 300ms ease;
+            animation: fade-up 750ms 560ms both;
         }
-
-        .sticker-svg {
-            filter: drop-shadow(0 0 15px rgba(96, 165, 250, 0.4));
-            transition: transform 0.5s ease;
+        .enter:hover { opacity: .88; transform: translateY(-2px); }
+        .enter svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
+        .redirect {
+            margin: 20px 0 0;
+            color: var(--muted);
+            font-size: .78rem;
+            animation: fade-up 750ms 690ms both;
         }
-
-        /* Rain Animation */
-        .rain-drop {
-            animation: rainFall 1s linear infinite;
+        .progress {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            overflow: hidden;
+            background: var(--line);
         }
-
-        @keyframes rainFall {
-            0% { transform: translateY(-5px); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(10px); opacity: 0; }
+        .progress span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background: var(--progress);
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: fill 5s linear 250ms forwards;
+        }
+        @keyframes arrive { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes fade-up { from { opacity: 0; transform: translateY(11px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes sun-rise { from { opacity: 0; transform: translateY(34px) scale(.75); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes sun-noon { from { opacity: 0; transform: translateY(9px) scale(.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes moon-enter { from { opacity: 0; transform: translateY(-18px) scale(.7); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+        @keyframes rotate { to { rotate: 360deg; } }
+        @keyframes glow { 0%, 100% { opacity: .72; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.06); } }
+        @keyframes twinkle { from { opacity: .35; transform: scale(.72); } to { opacity: 1; transform: scale(1.18); } }
+        @keyframes fill { to { transform: scaleX(1); } }
+        @media (max-width: 480px) {
+            body { padding: 18px; }
+            .welcome { padding-top: 24px; }
+            .sky { height: 163px; }
+            .landscape { bottom: 1px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+            .progress span { animation: none; transform: scaleX(1); }
         }
     </style>
 </head>
 <body>
-
-    <div id="greeting-overlay">
-        <div class="text-center px-6 animate-up">
-            <!-- Dynamic Sticker Section -->
-            <div id="time-sticker" class="sticker-container"></div>
-            
-            <h1 id="time-greeting" class="text-4xl md:text-6xl font-light mb-2">Hello,</h1>
-            <h2 id="user-identity" class="text-3xl md:text-5xl font-bold text-gradient mb-8">Identifying...</h2>
-            
-            <div id="loading-bar" class="w-48 h-1 bg-gray-700 mx-auto rounded-full overflow-hidden">
-                <div class="h-full bg-blue-500 w-0 transition-all duration-1500 ease-in-out" id="progress"></div>
-            </div>
+    <main class="welcome" aria-labelledby="welcome-title">
+        <div class="sky" aria-hidden="true">
+            <div class="stars"><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i><i class="star"></i></div>
+            <div class="moon"></div>
+            <svg class="sun" viewBox="0 0 120 120">
+                <g class="sun-rays">
+                    <path d="M60 7v12M60 101v12M7 60h12M101 60h12M22.5 22.5l8.5 8.5m58 58 8.5 8.5m0-75-8.5 8.5m-58 58-8.5 8.5"/>
+                </g>
+                <circle class="sun-core" cx="60" cy="60" r="25"/>
+            </svg>
+            <svg class="landscape" viewBox="0 0 440 90" preserveAspectRatio="none">
+                <path class="back-hill" d="M0 56Q92 5 183 54t157 4q48-30 100 0v32H0z"/>
+                <path class="front-hill" d="M0 67q89-39 177-4t153 1q56-26 110-2v28H0z"/>
+            </svg>
         </div>
-
-        <p class="redirect-notice animate-pulse">Entering Portfolio...</p>
-    </div>
-
+        <p class="greeting" id="greeting">A little hello from Sri Lanka</p>
+        <h1 id="welcome-title">Welcome</h1>
+        <p class="intro">Thanks for stopping by.<br>Come in and explore my work.</p>
+        <a class="enter" id="enter-portfolio" href="home.html">
+            Enter my portfolio
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </a>
+        <p class="redirect" id="redirect-message" aria-live="polite">Taking you to my portfolio in a moment…</p>
+        <div class="progress" aria-hidden="true"><span></span></div>
+    </main>
     <script>
-        function getIdentity() {
-            try {
-                const urlParams = new URLSearchParams(window.location.search);
-                const fromUrl = urlParams.get('email') || urlParams.get('name') || urlParams.get('user');
-                if (fromUrl) {
-                    localStorage.setItem('user_id', fromUrl);
-                    return fromUrl;
-                } 
-                const storedIdentity = localStorage.getItem('user_id');
-                return storedIdentity || "Friend";
-            } catch (e) {
-                return "Friend";
-            }
+        const hour = new Date().getHours();
+        let period;
+        let greeting;
+
+        if (hour >= 5 && hour < 12) {
+            period = "morning";
+            greeting = "Good morning";
+        } else if (hour >= 12 && hour < 17) {
+            period = "afternoon";
+            greeting = "Good afternoon";
+        } else {
+            period = "night";
+            greeting = "Good evening";
         }
 
-        function getTimeData() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const weather = urlParams.get('weather');
-            const hour = new Date().getHours();
+        document.body.dataset.period = period;
+        document.getElementById("greeting").textContent = greeting;
+        document.getElementById("theme-color").content = {
+            morning: "#f8f1df",
+            afternoon: "#e5f3f4",
+            night: "#17253a"
+        }[period];
 
-            // 1. Check for RAIN sticker first (Manual trigger for demo)
-            if (weather === 'rain') {
-                return {
-                    text: "Stay Dry,",
-                    sticker: `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 sticker-svg text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17.5 19c.7 0 1.2-.6 1.2-1.2 0-.9-.9-1.3-1.2-2.3-.3 1-1.2 1.4-1.2 2.3 0 .6.5 1.2 1.2 1.2z"/>
-                        <path d="M12 19c.7 0 1.2-.6 1.2-1.2 0-.9-.9-1.3-1.2-2.3-.3 1-1.2 1.4-1.2 2.3 0 .6.5 1.2 1.2 1.2z"/>
-                        <path d="M6.5 19c.7 0 1.2-.6 1.2-1.2 0-.9-.9-1.3-1.2-2.3-.3 1-1.2 1.4-1.2 2.3 0 .6.5 1.2 1.2 1.2z"/>
-                        <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/>
-                    </svg>`
-                };
-            }
+        const redirectMessage = document.getElementById("redirect-message");
+        const redirectTimer = window.setTimeout(() => {
+            window.location.assign("home.html");
+        }, 5000);
 
-            // 2. Default Time Stickers
-            if (hour >= 5 && hour < 12) {
-                // Morning Sun
-                return {
-                    text: "Good Morning,",
-                    sticker: `<svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 sticker-svg text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`
-                };
-            }
-            if (hour >= 12 && hour < 17) {
-                // Afternoon Sun (Bright)
-                return {
-                    text: "Good Afternoon,",
-                    sticker: `<svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 sticker-svg text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="m16 12-4 4-4-4"/></svg>`
-                };
-            }
-            // Night Moon
-            return {
-                text: "Good Evening,",
-                sticker: `<svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 sticker-svg text-indigo-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`
-            };
-        }
-
-        function init() {
-            const timeGreetingEl = document.getElementById('time-greeting');
-            const userIdEl = document.getElementById('user-identity');
-            const stickerEl = document.getElementById('time-sticker');
-            const progress = document.getElementById('progress');
-
-            const identity = getIdentity();
-            const timeData = getTimeData();
-
-            timeGreetingEl.textContent = timeData.text;
-            stickerEl.innerHTML = timeData.sticker;
-            userIdEl.textContent = identity;
-
-            setTimeout(() => { if (progress) progress.style.width = '100%'; }, 100);
-
-            setTimeout(() => {
-                try {
-                    window.location.href = "home.html";
-                } catch (err) {
-                    window.location.assign("./home.html");
-                }
-            }, 3000);
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
+        document.getElementById("enter-portfolio").addEventListener("click", () => {
+            window.clearTimeout(redirectTimer);
+            redirectMessage.textContent = "Opening portfolio…";
+        });
     </script>
 </body>
 </html>
